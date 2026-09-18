@@ -2,12 +2,16 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>掌上董事会 · 产品系统</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="掌上董事会 —— 把每个决定交给你的专属董事会。轻量投票决策工具，邀请朋友加入，3步完成决策，6级董事晋升体系。">
+<meta name="keywords" content="董事会,投票,决策,消费决策,出行决策,朋友投票,掌上董事会">
+<meta name="theme-color" content="#1E2630">
+<meta property="og:title" content="掌上董事会 · 产品系统">
+<meta property="og:description" content="把每个决定，交给你的董事会。一票在手，生杀我有。">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231E2630'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%23B8935A' stroke-width='2.5'/%3E%3Crect x='14.5' y='7' width='3' height='8' rx='1' fill='%23B8935A' transform='rotate(-35 16 16)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn" crossorigin>
+<link href="https://miaoda.feishu.cn/fonts/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --canvas:#F4F1EA; --canvas-2:#EDE9E0; --canvas-3:#E6E1D6;
@@ -24,11 +28,11 @@
   --ease:cubic-bezier(.22,.61,.36,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--canvas);color:var(--ink);font-family:"Manrope","Noto Sans SC",system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--canvas);color:var(--ink);font-family:"Manrope","Noto Sans SC",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh;overflow-x:hidden}
 img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button,a[href]{min-height:24px}
 input,select,textarea{font:inherit;color:inherit}
 ::selection{background:var(--accent);color:#fff}
@@ -37,7 +41,7 @@ input,select,textarea{font:inherit;color:inherit}
 .view.active{display:block;animation:fadeIn .35s var(--ease)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:var(--r-pill);font-weight:600;font-size:.9rem;transition:all .3s var(--ease);white-space:nowrap;border:1.5px solid transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:var(--r-pill);font-weight:600;font-size:.9rem;transition:all .3s var(--ease);white-space:nowrap;border:1.5px solid transparent;-webkit-tap-highlight-color:transparent}
 .btn-primary{background:var(--world);color:#F4F1EA}
 .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:var(--shadow-gold)}
 .btn-gold{background:var(--accent);color:#fff;box-shadow:var(--shadow-gold)}
@@ -50,6 +54,7 @@ input,select,textarea{font:inherit;color:inherit}
 .btn-sm{padding:7px 16px;font-size:.82rem}
 .btn-block{width:100%}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn:active{transform:scale(.97)}
 
 .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:var(--r-pill);font-size:.75rem;font-weight:600;letter-spacing:.02em}
 .tag-gold{background:rgba(184,147,90,.12);color:var(--accent-dark)}
@@ -66,20 +71,20 @@ input,select,textarea{font:inherit;color:inherit}
 .input-group label{font-size:.82rem;font-weight:600;color:var(--ink)}
 .input-group label .req{color:var(--danger)}
 .input-group .hint{font-size:.75rem;color:var(--muted)}
-.input-field{width:100%;padding:11px 16px;border:1.5px solid var(--line);border-radius:var(--r-control);background:var(--white);font-size:.92rem;transition:border-color .25s,box-shadow .25s}
+.input-field{width:100%;padding:11px 16px;border:1.5px solid var(--line);border-radius:var(--r-control);background:var(--white);font-size:.92rem;transition:border-color .25s,box-shadow .25s;-webkit-appearance:none;appearance:none}
 .input-field:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(184,147,90,.12)}
 .input-field::placeholder{color:var(--muted-light)}
 textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 
 /* 顶部导航 */
-.app-nav{position:sticky;top:0;z-index:90;background:rgba(244,241,234,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-light);padding:0 var(--gut)}
+.app-nav{position:sticky;top:0;z-index:90;background:rgba(244,241,234,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line-light);padding:0 var(--gut)}
 .app-nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
-.app-logo{display:flex;align-items:center;gap:9px;font-family:"Noto Sans SC",sans-serif;font-weight:900;font-size:1.05rem;cursor:pointer}
-.app-logo .mark{width:30px;height:30px;background:var(--world);border-radius:7px;display:grid;place-items:center;position:relative}
+.app-logo{display:flex;align-items:center;gap:9px;font-family:"Noto Sans SC",sans-serif;font-weight:900;font-size:1.05rem;cursor:pointer;user-select:none}
+.app-logo .mark{width:30px;height:30px;background:var(--world);border-radius:7px;display:grid;place-items:center;position:relative;flex-shrink:0}
 .app-logo .mark::after{content:"";width:12px;height:12px;border:2.5px solid var(--accent);border-radius:50%}
 .app-logo .mark::before{content:"";position:absolute;width:2.5px;height:14px;background:var(--accent);border-radius:2px;transform:rotate(-35deg);top:4px}
 
-.board-switcher{display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-control);cursor:pointer;transition:all .25s;font-size:.88rem;font-weight:600}
+.board-switcher{display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-control);cursor:pointer;transition:all .25s;font-size:.88rem;font-weight:600;user-select:none}
 .board-switcher:hover{border-color:var(--accent)}
 .board-switcher .bs-name{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .board-switcher .bs-badge{font-size:.65rem;padding:2px 7px;background:var(--accent);color:#fff;border-radius:var(--r-pill);font-weight:700}
@@ -88,7 +93,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .nav-icon-btn{width:38px;height:38px;border-radius:var(--r-control);display:grid;place-items:center;color:var(--muted);transition:all .25s;position:relative}
 .nav-icon-btn:hover{background:var(--canvas-2);color:var(--ink)}
 .nav-icon-btn .badge-dot{position:absolute;top:7px;right:7px;width:8px;height:8px;background:var(--accent);border-radius:50%;border:2px solid var(--canvas)}
-.nav-avatar{width:36px;height:36px;border-radius:50%;background:var(--world);display:grid;place-items:center;color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;border:2px solid var(--accent);transition:transform .25s}
+.nav-avatar{width:36px;height:36px;border-radius:50%;background:var(--world);display:grid;place-items:center;color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;border:2px solid var(--accent);transition:transform .25s;flex-shrink:0}
 .nav-avatar:hover{transform:scale(1.05)}
 
 /* 应用布局 */
@@ -98,7 +103,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .sidebar-board-info .sbi-name{font-weight:700;font-size:.95rem;margin-bottom:3px;display:flex;align-items:center;gap:6px}
 .sidebar-board-info .sbi-role{font-size:.72rem;color:var(--accent-light)}
 .sidebar-board-info .sbi-count{font-size:.75rem;color:rgba(244,241,234,.5);margin-top:10px;padding-top:10px;border-top:1px solid rgba(244,241,234,.1)}
-.side-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-control);font-size:.88rem;font-weight:500;color:var(--muted);transition:all .2s;cursor:pointer}
+.side-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-control);font-size:.88rem;font-weight:500;color:var(--muted);transition:all .2s;cursor:pointer;user-select:none}
 .side-link:hover{background:var(--canvas-2);color:var(--ink)}
 .side-link.active{background:rgba(184,147,90,.1);color:var(--accent-dark);font-weight:600}
 .side-link .sl-count{margin-left:auto;font-size:.72rem;background:var(--canvas-2);padding:2px 8px;border-radius:var(--r-pill);color:var(--muted)}
@@ -111,7 +116,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .page-head .sub{font-size:.88rem;color:var(--muted);margin-top:4px}
 
 .filters{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-.filter-chip{padding:7px 16px;border-radius:var(--r-pill);font-size:.82rem;font-weight:500;background:var(--white);border:1px solid var(--line);color:var(--muted);cursor:pointer;transition:all .2s}
+.filter-chip{padding:7px 16px;border-radius:var(--r-pill);font-size:.82rem;font-weight:500;background:var(--white);border:1px solid var(--line);color:var(--muted);cursor:pointer;transition:all .2s;user-select:none}
 .filter-chip:hover{border-color:var(--accent);color:var(--accent-dark)}
 .filter-chip.active{background:var(--world);color:#F4F1EA;border-color:var(--world)}
 
@@ -150,7 +155,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .auth-visual p{font-size:1rem;color:rgba(244,241,234,.6);line-height:1.8;max-width:380px}
 .auth-visual .av-points{margin-top:36px;display:flex;flex-direction:column;gap:14px}
 .auth-visual .av-point{display:flex;align-items:center;gap:12px;font-size:.9rem;color:rgba(244,241,234,.75)}
-.auth-visual .av-point i{width:22px;height:22px;border-radius:50%;background:rgba(184,147,90,.2);display:grid;place-items:center;flex-shrink:0}
+.auth-visual .av-point i{width:22px;height:22px;border-radius:50%;background:rgba(184,147,90,.2);display:grid;place-items:center;flex-shrink:0;font-style:normal;font-size:.75rem}
 
 .auth-form-wrap{display:flex;align-items:center;justify-content:center;padding:40px;background:var(--canvas)}
 .auth-form{width:100%;max-width:380px}
@@ -178,7 +183,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .detail-images{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
 .detail-images img{width:100%;height:140px;object-fit:cover;border-radius:var(--r-control);cursor:pointer;transition:transform .2s var(--ease)}
 .detail-images img:hover{transform:scale(1.02)}
-.img-upload-zone{border:1.5px dashed var(--line);border-radius:var(--r-control);padding:20px;text-align:center;cursor:pointer;transition:all .2s var(--ease);background:var(--bg-warm)}
+.img-upload-zone{border:1.5px dashed var(--line);border-radius:var(--r-control);padding:20px;text-align:center;cursor:pointer;transition:all .2s var(--ease);background:var(--canvas)}
 .img-upload-zone:hover{border-color:var(--accent);background:rgba(184,147,90,.04)}
 .img-upload-zone svg{color:var(--muted);margin-bottom:6px}
 .img-upload-zone .uz-text{font-size:.85rem;color:var(--muted)}
@@ -196,10 +201,10 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .vote-result-bar{display:flex;height:44px;border-radius:var(--r-control);overflow:hidden;margin-bottom:14px}
 .vote-result-bar .vr-yes{background:linear-gradient(90deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;transition:width .6s var(--ease)}
 .vote-result-bar .vr-no{background:var(--world-3);display:flex;align-items:center;justify-content:center;color:rgba(244,241,234,.8);font-weight:600;font-size:.85rem;transition:width .6s var(--ease)}
-.vote-stats{display:flex;gap:24px;font-size:.85rem;color:var(--muted)}
+.vote-stats{display:flex;gap:24px;font-size:.85rem;color:var(--muted);flex-wrap:wrap}
 .vote-stats strong{color:var(--ink);font-family:"Space Grotesk",monospace;font-size:1.1rem}
 .vote-actions{display:flex;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--line-light)}
-.vote-btn{flex:1;padding:14px;border-radius:var(--r-control);font-weight:700;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .3s var(--ease);border:2px solid transparent}
+.vote-btn{flex:1;padding:14px;border-radius:var(--r-control);font-weight:700;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .3s var(--ease);border:2px solid transparent;cursor:pointer}
 .vote-btn.yes{background:rgba(184,147,90,.1);color:var(--accent-dark);border-color:rgba(184,147,90,.3)}
 .vote-btn.yes:hover{background:var(--accent);color:#fff;transform:translateY(-2px);box-shadow:var(--shadow-gold)}
 .vote-btn.no{background:rgba(160,74,58,.06);color:var(--danger);border-color:rgba(160,74,58,.25)}
@@ -239,27 +244,27 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .invite-panel{background:var(--white);border-radius:var(--r-card);border:1px solid var(--line-light);padding:36px;text-align:center;max-width:520px;margin:0 auto}
 .invite-code{font-family:"Space Grotesk",monospace;font-size:2rem;font-weight:700;letter-spacing:.15em;color:var(--world);padding:20px;background:var(--canvas);border-radius:var(--r-control);border:2px dashed var(--line);margin:20px 0}
 .invite-link{display:flex;gap:8px;margin:16px 0}
-.invite-link input{flex:1;padding:11px 16px;border:1.5px solid var(--line);border-radius:var(--r-control);background:var(--canvas);font-size:.85rem;font-family:"Space Grotesk",monospace;color:var(--muted)}
+.invite-link input{flex:1;padding:11px 16px;border:1.5px solid var(--line);border-radius:var(--r-control);background:var(--canvas);font-size:.85rem;font-family:"Space Grotesk",monospace;color:var(--muted);min-width:0}
 .invite-link button{flex-shrink:0}
 
 /* 个人中心 */
 .profile-header{background:var(--world);border-radius:var(--r-card);padding:32px;color:#F4F1EA;margin-bottom:24px;position:relative;overflow:hidden}
 .profile-header::after{content:"";position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(184,147,90,.2),transparent 65%)}
 .ph-top{display:flex;align-items:center;gap:20px;position:relative;z-index:2}
-.ph-avatar{width:72px;height:72px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-size:1.6rem;font-weight:800;color:#fff;border:3px solid rgba(244,241,234,.2)}
+.ph-avatar{width:72px;height:72px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-size:1.6rem;font-weight:800;color:#fff;border:3px solid rgba(244,241,234,.2);flex-shrink:0;cursor:pointer}
 .ph-info h2{font-family:"Noto Sans SC",sans-serif;font-size:1.4rem;font-weight:800}
 .ph-info .ph-level{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:.82rem;color:var(--accent-light);font-weight:600}
-.ph-stats{display:flex;gap:32px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(244,241,234,.1);position:relative;z-index:2}
+.ph-stats{display:flex;gap:32px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(244,241,234,.1);position:relative;z-index:2;flex-wrap:wrap}
 .ph-stat .num{font-family:"Space Grotesk",monospace;font-size:1.5rem;font-weight:700}
 .ph-stat .label{font-size:.78rem;color:rgba(244,241,234,.5);margin-top:2px}
 
-/* 我的董事会列表（个人中心） */
+/* 我的董事会列表 */
 .my-boards-section{margin-bottom:20px}
 .my-boards-section h3{font-size:1rem;font-weight:700;margin-bottom:14px}
 .my-board-card{display:flex;align-items:center;gap:16px;padding:18px 22px;background:var(--white);border:1px solid var(--line-light);border-radius:var(--r-card);margin-bottom:10px;cursor:pointer;transition:all .25s}
 .my-board-card:hover{border-color:rgba(184,147,90,.3);box-shadow:var(--shadow-card)}
 .my-board-card .mb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.my-board-card .mb-info{flex:1}
+.my-board-card .mb-info{flex:1;min-width:0}
 .my-board-card .mb-name{font-weight:600;font-size:.95rem}
 .my-board-card .mb-meta{font-size:.78rem;color:var(--muted);margin-top:2px}
 .my-board-card .mb-level{text-align:right;flex-shrink:0}
@@ -270,7 +275,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .level-track{background:var(--white);border-radius:var(--r-card);border:1px solid var(--line-light);padding:28px;margin-bottom:20px}
 .level-track h3{font-size:1rem;font-weight:700;margin-bottom:20px}
 .level-progress{margin-bottom:20px}
-.level-progress .lp-label{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:8px}
+.level-progress .lp-label{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:8px;flex-wrap:wrap;gap:4px}
 .level-progress .lp-label .current{color:var(--accent-dark);font-weight:600}
 .level-progress .lp-bar{height:10px;background:var(--canvas-2);border-radius:var(--r-pill);overflow:hidden}
 .level-progress .lp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:var(--r-pill);transition:width .8s var(--ease)}
@@ -287,21 +292,21 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .form-card .form-actions{display:flex;gap:12px;margin-top:28px;padding-top:24px;border-top:1px solid var(--line-light)}
 
 .type-options{display:flex;gap:10px}
-.type-option{flex:1;padding:14px;border:1.5px solid var(--line);border-radius:var(--r-control);text-align:center;cursor:pointer;transition:all .25s}
+.type-option{flex:1;padding:14px;border:1.5px solid var(--line);border-radius:var(--r-control);text-align:center;cursor:pointer;transition:all .25s;user-select:none}
 .type-option:hover{border-color:var(--accent)}
 .type-option.selected{border-color:var(--accent);background:rgba(184,147,90,.06)}
 .type-option .to-icon{font-size:1.3rem;margin-bottom:4px}
 .type-option .to-label{font-size:.82rem;font-weight:600}
 
 .deadline-options{display:flex;gap:8px;flex-wrap:wrap}
-.deadline-opt{padding:8px 16px;border:1.5px solid var(--line);border-radius:var(--r-pill);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s}
+.deadline-opt{padding:8px 16px;border:1.5px solid var(--line);border-radius:var(--r-pill);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;user-select:none}
 .deadline-opt:hover{border-color:var(--accent)}
 .deadline-opt.selected{background:var(--world);color:#F4F1EA;border-color:var(--world)}
 
 /* 弹窗 */
-.modal-overlay{position:fixed;inset:0;background:rgba(26,28,32,.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{position:fixed;inset:0;background:rgba(26,28,32,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.active{display:flex;animation:fadeIn .25s}
-.modal{background:var(--white);border-radius:var(--r-shell);padding:32px;max-width:440px;width:100%;box-shadow:0 24px 64px -16px rgba(30,38,48,.3);animation:modalIn .3s var(--ease)}
+.modal{background:var(--white);border-radius:var(--r-shell);padding:32px;max-width:440px;width:100%;box-shadow:0 24px 64px -16px rgba(30,38,48,.3);animation:modalIn .3s var(--ease);max-height:85vh;overflow-y:auto}
 @keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
 .modal h3{font-family:"Noto Sans SC",sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:8px}
 .modal .modal-sub{font-size:.88rem;color:var(--muted);margin-bottom:20px;line-height:1.6}
@@ -323,7 +328,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .bs-item.active{border-color:var(--accent);background:rgba(184,147,90,.06)}
 .bs-item .bs-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .bs-item .bs-info{flex:1;min-width:0}
-.bs-item .bs-name{font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:6px}
+.bs-item .bs-name{font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .bs-item .bs-meta{font-size:.78rem;color:var(--muted);margin-top:2px}
 .bs-item .bs-level{font-size:.68rem;font-weight:700;color:var(--accent-dark);background:rgba(184,147,90,.1);padding:2px 8px;border-radius:var(--r-pill);flex-shrink:0}
 .bs-item .bs-current-tag{font-size:.68rem;font-weight:700;color:#fff;background:var(--accent);padding:2px 8px;border-radius:var(--r-pill);flex-shrink:0}
@@ -331,10 +336,11 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .bs-create-btn:hover{border-color:var(--accent);color:var(--accent-dark);background:rgba(184,147,90,.04)}
 
 /* Toast */
-.toast-container{position:fixed;top:80px;right:24px;z-index:300;display:flex;flex-direction:column;gap:10px}
-.toast{background:var(--world);color:#F4F1EA;padding:14px 20px;border-radius:var(--r-control);font-size:.88rem;font-weight:500;box-shadow:0 8px 32px -8px rgba(30,38,48,.3);display:flex;align-items:center;gap:10px;animation:toastIn .35s var(--ease);max-width:340px}
+.toast-container{position:fixed;top:80px;right:24px;z-index:300;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--world);color:#F4F1EA;padding:14px 20px;border-radius:var(--r-control);font-size:.88rem;font-weight:500;box-shadow:0 8px 32px -8px rgba(30,38,48,.3);display:flex;align-items:center;gap:10px;animation:toastIn .35s var(--ease);max-width:340px;pointer-events:auto}
 .toast.success{border-left:3px solid var(--accent)}
 .toast.info{border-left:3px solid #5A7A8A}
+.toast.error{border-left:3px solid var(--danger)}
 @keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 
 /* 通知面板 */
@@ -348,20 +354,27 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 .notif-item:hover{background:var(--canvas)}
 .notif-item.unread{background:rgba(184,147,90,.04)}
 .notif-item .ni-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;color:#fff;margin-top:2px}
-.notif-item .ni-content{flex:1}
+.notif-item .ni-content{flex:1;min-width:0}
 .notif-item .ni-title{font-size:.85rem;font-weight:600;margin-bottom:2px}
 .notif-item .ni-time{font-size:.72rem;color:var(--muted)}
 
-/* ═══ 移动端底部导航 ═══ */
+/* 移动端底部导航 */
 .mobile-tabbar{display:none;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--white);border-top:1px solid var(--line-light);box-shadow:0 -4px 20px -8px rgba(30,38,48,.12);z-index:100;align-items:center;justify-content:space-around;padding:0 8px;padding-bottom:env(safe-area-inset-bottom)}
-.mtab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;height:100%;color:var(--muted);cursor:pointer;transition:color .2s;font-size:.68rem;font-weight:600}
+.mtab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;height:100%;color:var(--muted);cursor:pointer;transition:color .2s;font-size:.68rem;font-weight:600;user-select:none}
 .mtab.active{color:var(--accent-dark)}
 .mtab svg{width:22px;height:22px}
 .mtab-fab{position:relative}
 .mtab-fab-btn{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;display:grid;place-items:center;box-shadow:0 4px 16px -4px rgba(184,147,90,.5);margin-top:-24px;border:3px solid var(--white)}
 
+/* ═══ 平板适配 (769px - 1024px) ═══ */
+@media(max-width:1024px){
+  .app-layout{grid-template-columns:180px 1fr;gap:20px;padding:20px var(--gut) 60px}
+  .detail-header,.vote-panel{padding:24px}
+  .level-cards{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ═══ 移动端适配 (≤900px) ═══ */
 @media(max-width:900px){
-  /* 基础布局 */
   .app-nav-inner{height:54px;padding:0 16px;gap:12px}
   .app-layout{grid-template-columns:1fr;padding:16px 16px 90px;gap:16px;max-width:100%}
   .app-sidebar{display:none}
@@ -373,7 +386,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   /* 登录注册页 */
   .auth-page{grid-template-columns:1fr;min-height:100vh}
   .auth-visual{display:none}
-  .auth-form-wrap{padding:20px}
+  .auth-form-wrap{padding:20px;min-height:100vh;align-items:flex-start;padding-top:40px}
   .auth-form{max-width:100%;padding:0}
   .af-logo{margin-bottom:24px}
   .auth-form h1{font-size:1.6rem}
@@ -381,15 +394,11 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   /* 董事会切换器 */
   .board-switcher{padding:8px 14px}
   .board-switcher .bs-name{max-width:120px;font-size:.88rem}
-  .bs-level{font-size:.65rem;padding:1px 5px}
 
-  /* 卡片优化 */
-  .card{padding:18px}
-  .proposal-card{padding:16px}
-  .proposal-card .pc-title{font-size:.95rem}
-  .proposal-card .pc-meta{font-size:.75rem;flex-wrap:wrap;gap:6px}
-  .filter-tabs{gap:6px;overflow-x:auto;padding-bottom:4px}
-  .filter-tab{padding:8px 16px;font-size:.8rem;white-space:nowrap}
+  /* 提案列表改为卡片式 */
+  .proposal-row{flex-wrap:wrap;gap:12px;padding:16px}
+  .pr-vote{width:100%;order:3}
+  .pr-action{margin-left:auto}
 
   /* 提案详情 */
   .detail-header{padding:20px}
@@ -412,16 +421,10 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   .ph-stat .num{font-size:1.3rem}
   .ph-stat .label{font-size:.7rem}
   .level-cards{grid-template-columns:repeat(3,1fr);gap:8px}
-  .level-card{padding:10px 6px}
-  .level-card .lc-code{font-size:.85rem}
-  .level-card .lc-name{font-size:.65rem}
 
   /* 职级页表格 */
   table{font-size:.78rem}
   th,td{padding:10px 8px}
-
-  /* 我的董事会 */
-  .my-boards-card{padding:16px}
 
   /* 表单 */
   .form-card{padding:20px}
@@ -430,9 +433,11 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   .input-field{padding:12px 14px;font-size:.9rem}
   .btn{padding:12px 20px;font-size:.88rem}
   .btn-block{width:100%}
+  .form-card .form-actions{flex-direction:column-reverse;gap:8px}
+  .form-card .form-actions .btn{width:100%}
 
   /* 模态框改为底部弹出 */
-  .modal-overlay{align-items:flex-end}
+  .modal-overlay{align-items:flex-end;padding:0}
   .modal{max-width:100%;width:100%;border-radius:20px 20px 0 0;padding:24px 20px;max-height:85vh;overflow-y:auto;animation:modalSlideUp .3s var(--ease)}
   .modal-actions{flex-direction:column-reverse;gap:8px}
   .modal-actions .btn{width:100%}
@@ -444,18 +449,17 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   /* 邀请页 */
   .invite-panel{padding:24px 20px}
   .invite-code{font-size:1.4rem;padding:16px}
+  .invite-link{flex-direction:column}
+  .invite-link button{width:100%}
 
   /* 成员管理 */
-  .member-row{padding:12px 0;gap:10px}
-  .member-avatar{width:40px;height:40px;font-size:.85rem}
+  .member-grid{grid-template-columns:1fr}
 
   /* 发起提案 */
-  .type-grid{grid-template-columns:repeat(3,1fr);gap:8px}
-  .type-card{padding:14px 8px}
-  .type-card .tc-icon{font-size:1.4rem}
-  .type-card .tc-label{font-size:.75rem}
-  .deadline-options{grid-template-columns:repeat(3,1fr);gap:6px}
-  .deadline-opt{padding:10px 6px;font-size:.78rem}
+  .type-options{flex-wrap:wrap}
+  .type-option{min-width:calc(50% - 5px)}
+  .deadline-options{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .deadline-opt{padding:10px 6px;font-size:.78rem;text-align:center}
 
   /* 图片上传 */
   .img-upload-zone{padding:20px}
@@ -464,11 +468,6 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   /* 详情返回按钮 */
   .detail-back{font-size:.82rem;margin-bottom:14px}
 
-  /* 统计数字 */
-  .stat-card{padding:14px}
-  .stat-card .sc-num{font-size:1.3rem}
-  .stat-card .sc-label{font-size:.72rem}
-
   /* 职级进度 */
   .lp-bar{height:8px}
 
@@ -476,19 +475,54 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   .sidebar-board-info{display:none}
   .side-section{display:none}
 
+  /* 我的董事会 */
+  .my-boards-section .my-board-card{flex-wrap:wrap;gap:10px}
+  .mb-level{margin-left:auto}
+
   /* 内容底部留白避免被tabbar遮挡 */
   .app-main{padding-bottom:20px}
+
+  /* Toast 位置调整 */
+  .toast-container{top:64px;right:12px;left:12px;align-items:stretch}
+  .toast{max-width:none}
 }
 
 @keyframes modalSlideUp{from{transform:translateY(100%);opacity:.5}to{transform:translateY(0);opacity:1}}
 
+/* ═══ 小屏手机适配 (≤480px) ═══ */
 @media(max-width:480px){
   .app-layout{padding:12px 12px 80px}
   .auth-form-wrap{padding:16px}
   .level-cards{grid-template-columns:repeat(2,1fr)}
   .ph-stats{gap:8px}
-  .filter-tabs{gap:4px}
-  .filter-tab{padding:7px 12px;font-size:.75rem}
+  .page-head h1{font-size:1.3rem}
+  .detail-header,.vote-panel{padding:16px}
+  .form-card{padding:16px}
+  .member-card{padding:14px}
+  .my-board-card{padding:14px 16px}
+  .invite-panel{padding:20px 16px}
+  .proposal-row{padding:14px}
+  .pr-type{width:36px;height:36px;font-size:1rem}
+  .pr-title{font-size:.9rem}
+  .pr-meta{font-size:.72rem;gap:8px}
+  .pr-vote-text{font-size:.68rem}
+  .app-logo{font-size:.95rem}
+  .app-logo .mark{width:26px;height:26px}
+  .board-switcher{padding:6px 10px;font-size:.8rem}
+  .board-switcher .bs-name{max-width:90px}
+  .nav-icon-btn{width:34px;height:34px}
+  .nav-avatar{width:32px;height:32px}
+}
+
+/* ═══ 横屏手机适配 ═══ */
+@media(max-height:500px) and (orientation:landscape){
+  .auth-form-wrap{padding:20px;overflow-y:auto}
+  .auth-form{padding:20px 0}
+}
+
+/* ═══ 桌面端大屏幕优化 ═══ */
+@media(min-width:1440px){
+  .app-layout{max-width:1320px}
 }
 </style>
 </head>
@@ -502,7 +536,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   <div class="notif-list" id="notifList"></div>
 </div>
 
-<!-- ═══ 移动端底部导航 ═══ -->
+<!-- 移动端底部导航 -->
 <nav class="mobile-tabbar" id="mobileTabbar">
   <div class="mtab" onclick="go('board-home')" data-view="board-home">
     <svg width="22" height="22" viewBox="0 0 256 256" fill="currentColor"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM160,96a8,8,0,0,1,8-8h32a8,8,0,0,1,0,16H168A8,8,0,0,1,160,96Zm-32,16a32,32,0,1,0,32,32A32,32,0,0,0,128,112Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,128,160Z"/></svg>
@@ -527,7 +561,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </nav>
 
-<!-- ═══ 登录 ═══ -->
+<!-- 登录 -->
 <div class="view active" id="view-login">
   <div class="auth-page">
     <div class="auth-visual">
@@ -547,8 +581,8 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
         <h1>欢迎回来</h1>
         <p class="af-sub">登录你的账号，继续召开董事会</p>
         <div class="form-body">
-          <div class="input-group"><label>邮箱 <span class="req">*</span></label><input class="input-field" type="email" id="loginEmail" placeholder="your@email.com" value="vanca@example.com"></div>
-          <div class="input-group"><label>密码 <span class="req">*</span></label><input class="input-field" type="password" id="loginPwd" placeholder="输入密码" value="••••••••"></div>
+          <div class="input-group"><label>邮箱 <span class="req">*</span></label><input class="input-field" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"></div>
+          <div class="input-group"><label>密码 <span class="req">*</span></label><input class="input-field" type="password" id="loginPwd" placeholder="输入密码" autocomplete="current-password"></div>
           <div style="text-align:right;margin-bottom:16px"><a onclick="go('forgot')" style="font-size:.85rem;color:var(--accent-dark);cursor:pointer">忘记密码？</a></div>
           <button class="btn btn-gold btn-block" onclick="doLogin()">登 录</button>
         </div>
@@ -558,7 +592,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 注册 ═══ -->
+<!-- 注册 -->
 <div class="view" id="view-register">
   <div class="auth-page">
     <div class="auth-visual">
@@ -574,9 +608,9 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
         <p class="af-sub">加入掌上董事会，开始你的董事生涯</p>
         <div id="inviteBanner" style="display:none;padding:12px 16px;background:rgba(184,147,90,.1);border:1px solid rgba(184,147,90,.3);border-radius:var(--r-control);font-size:.82rem;color:var(--accent-dark);margin-bottom:16px;line-height:1.5">你正在通过邀请加入 <strong id="inviteBannerName">董事会</strong>，注册后将自动加入并设为默认董事会</div>
         <div class="form-body">
-          <div class="input-group"><label>昵称 <span class="req">*</span></label><input class="input-field" id="regName" placeholder="你的昵称" value="Vanca"><span class="hint">默认取邮箱前缀，可随时修改</span></div>
-          <div class="input-group"><label>邮箱 <span class="req">*</span></label><input class="input-field" type="email" id="regEmail" placeholder="your@email.com" value="vanca@example.com"></div>
-          <div class="input-group"><label>密码 <span class="req">*</span></label><input class="input-field" type="password" id="regPwd" placeholder="至少 6 位" value="••••••••"></div>
+          <div class="input-group"><label>昵称 <span class="req">*</span></label><input class="input-field" id="regName" placeholder="你的昵称" autocomplete="nickname"><span class="hint">默认取邮箱前缀，可随时修改</span></div>
+          <div class="input-group"><label>邮箱 <span class="req">*</span></label><input class="input-field" type="email" id="regEmail" placeholder="your@email.com" autocomplete="email"></div>
+          <div class="input-group"><label>密码 <span class="req">*</span></label><input class="input-field" type="password" id="regPwd" placeholder="至少 6 位" autocomplete="new-password"></div>
           <button class="btn btn-gold btn-block" onclick="doRegister()">注 册 并 创建董事会</button>
         </div>
         <p class="af-footer">已有账号？<a onclick="go('login')">返回登录</a></p>
@@ -585,7 +619,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 忘记密码 ═══ -->
+<!-- 忘记密码 -->
 <div class="view" id="view-forgot">
   <div class="auth-page">
     <div class="auth-visual">
@@ -600,13 +634,13 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
         <h1>找回密码</h1>
         <p class="af-sub">输入邮箱地址，验证后重置密码</p>
         <div class="form-body" id="forgotStep1">
-          <div class="input-group"><label>邮箱地址 <span class="req">*</span></label><input class="input-field" type="email" id="forgotEmail" placeholder="your@email.com"><span class="hint">请输入注册时使用的邮箱</span></div>
+          <div class="input-group"><label>邮箱地址 <span class="req">*</span></label><input class="input-field" type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email"><span class="hint">请输入注册时使用的邮箱</span></div>
           <button class="btn btn-gold btn-block" onclick="verifyForgotEmail()">验证邮箱</button>
         </div>
         <div class="form-body" id="forgotStep2" style="display:none">
           <div style="padding:12px 16px;background:rgba(58,122,74,.08);border-radius:var(--r-control);font-size:.85rem;color:var(--success);margin-bottom:16px">✓ 邮箱验证通过，请设置新密码</div>
-          <div class="input-group"><label>新密码 <span class="req">*</span></label><input class="input-field" type="password" id="newPwd" placeholder="至少 6 位"><span class="hint">密码至少 6 位，建议包含字母和数字</span></div>
-          <div class="input-group"><label>确认新密码 <span class="req">*</span></label><input class="input-field" type="password" id="confirmNewPwd" placeholder="再次输入新密码"></div>
+          <div class="input-group"><label>新密码 <span class="req">*</span></label><input class="input-field" type="password" id="newPwd" placeholder="至少 6 位" autocomplete="new-password"><span class="hint">密码至少 6 位，建议包含字母和数字</span></div>
+          <div class="input-group"><label>确认新密码 <span class="req">*</span></label><input class="input-field" type="password" id="confirmNewPwd" placeholder="再次输入新密码" autocomplete="new-password"></div>
           <button class="btn btn-gold btn-block" onclick="resetPassword()">确认重置密码</button>
         </div>
         <p class="af-footer">想起密码了？<a onclick="go('login')">返回登录</a></p>
@@ -615,7 +649,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 创建董事会引导 ═══ -->
+<!-- 创建董事会引导 -->
 <div class="view" id="view-onboarding">
   <div class="auth-page">
     <div class="auth-visual">
@@ -630,8 +664,8 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
         <h1>创建董事会</h1>
         <p class="af-sub">为你的董事会取个名字</p>
         <div class="form-body">
-          <div class="input-group"><label>董事会名称 <span class="req">*</span></label><input class="input-field" id="boardName" placeholder="例如：Vanca 的朋友圈董事会" value="Vanca 的董事会"><span class="hint">最多 30 字，创建后可修改</span></div>
-          <div class="input-group"><label>董事会简介</label><textarea class="input-field" id="boardDesc" placeholder="一句话描述这个董事会是做什么的" style="min-height:70px">专门审批消费和出行决策的朋友圈董事会</textarea></div>
+          <div class="input-group"><label>董事会名称 <span class="req">*</span></label><input class="input-field" id="boardName" placeholder="例如：我的朋友圈董事会" maxlength="30"><span class="hint">最多 30 字，创建后可修改</span></div>
+          <div class="input-group"><label>董事会简介</label><textarea class="input-field" id="boardDesc" placeholder="一句话描述这个董事会是做什么的" style="min-height:70px"></textarea></div>
           <button class="btn btn-gold btn-block" onclick="createBoardFromOnboarding()">创建并进入</button>
         </div>
       </div>
@@ -639,15 +673,15 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 登录后导航模板 ═══ -->
+<!-- 登录后导航模板 -->
 <template id="appNavTemplate">
   <nav class="app-nav">
     <div class="app-nav-inner">
-      <div style="display:flex;align-items:center;gap:16px">
-        <div class="app-logo" onclick="go('board-home')"><span class="mark"></span>掌上董事会</div>
+      <div style="display:flex;align-items:center;gap:16px;min-width:0">
+        <div class="app-logo" onclick="go('board-home')"><span class="mark"></span><span style="white-space:nowrap">掌上董事会</span></div>
         <div class="board-switcher" onclick="showBoardSwitcher()">
-          <span class="bs-name nav-board-name">Vanca 的董事会</span>
-          <span class="bs-badge nav-board-level">L3</span>
+          <span class="bs-name nav-board-name">董事会</span>
+          <span class="bs-badge nav-board-level">L1</span>
           <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg>
         </div>
       </div>
@@ -656,33 +690,33 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
           <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"/></svg>
           <span class="badge-dot" id="notifDot"></span>
         </div>
-        <div class="nav-avatar" onclick="go('profile')" title="个人中心">V</div>
+        <div class="nav-avatar" onclick="go('profile')" title="个人中心">U</div>
       </div>
     </div>
   </nav>
 </template>
 
-<!-- ═══ 董事会首页（提案大厅） ═══ -->
+<!-- 董事会首页（提案大厅） -->
 <div class="view" id="view-board-home">
   <div id="appNavSlot1"></div>
   <div class="app-layout">
     <aside class="app-sidebar">
       <div class="sidebar-board-info">
-        <div class="sbi-name side-board-name">Vanca 的董事会 <span class="tag tag-gold side-board-tag" style="font-size:.6rem;padding:2px 7px">L3</span></div>
-        <div class="sbi-role side-board-role">专业委员会主任</div>
-        <div class="sbi-count side-board-count">8 名成员 · 15 份提案</div>
+        <div class="sbi-name side-board-name">董事会 <span class="tag tag-gold side-board-tag" style="font-size:.6rem;padding:2px 7px">L1</span></div>
+        <div class="sbi-role side-board-role">董事</div>
+        <div class="sbi-count side-board-count">0 名成员 · 0 份提案</div>
       </div>
       <div class="side-link active" onclick="go('board-home')">
         <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M224,200h-8V40a8,8,0,0,0-8-8H152a8,8,0,0,0-8,8V80H96a8,8,0,0,0-8,8v40H48a8,8,0,0,0-8,8v64H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16ZM160,48h40V200H160ZM104,96h40V200H104ZM56,144H88v56H56Z"/></svg>
-        提案大厅 <span class="sl-count side-proposal-count">3</span>
+        提案大厅 <span class="sl-count side-proposal-count">0</span>
       </div>
       <div class="side-link" onclick="go('history')">
         <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>
-        已决议 <span class="sl-count side-history-count">12</span>
+        已决议 <span class="sl-count side-history-count">0</span>
       </div>
       <div class="side-link" onclick="go('members')">
         <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"/></svg>
-        成员管理 <span class="sl-count side-member-count">8</span>
+        成员管理 <span class="sl-count side-member-count">1</span>
       </div>
       <div class="side-link" onclick="go('invite')">
         <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M176,160a39.89,39.89,0,0,0-28.62,12.09l-46.1-29.63a39.8,39.8,0,0,0,0-28.92l46.1-29.63a40,40,0,1,0-8.66-13.45l-46.1,29.63a40,40,0,1,0,0,55.82l46.1,29.63A40,40,0,1,0,176,160Z"/></svg>
@@ -710,7 +744,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
       <div class="page-head">
         <div>
           <h1>提案大厅</h1>
-          <div class="sub page-head-sub">3 个提案正在投票中 · 达到门槛即自动出决议</div>
+          <div class="sub page-head-sub">提案正在投票中 · 达到门槛即自动出决议</div>
         </div>
         <button class="btn btn-gold" onclick="go('create-proposal')">
           <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
@@ -728,7 +762,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 发起提案 ═══ -->
+<!-- 发起提案 -->
 <div class="view" id="view-create-proposal">
   <div id="appNavSlot2"></div>
   <div class="app-layout">
@@ -754,7 +788,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
             <span class="hint">最多 50 字，简洁有力 <span id="titleCount">0/50</span></span>
           </div>
           <div class="form-row">
-            <div class="input-group"><label>金额（可选）</label><input class="input-field" id="propAmount" type="number" placeholder="¥ 0.00" min="0"><span class="hint">消费类提案建议填写</span></div>
+            <div class="input-group"><label>金额（可选）</label><input class="input-field" id="propAmount" type="number" placeholder="¥ 0.00" min="0" inputmode="decimal"><span class="hint">消费类提案建议填写</span></div>
             <div class="input-group"><label>截止时间 <span class="req">*</span></label>
               <div class="deadline-options">
                 <span class="deadline-opt" onclick="selectDeadline(this,'1h')">1小时</span>
@@ -785,7 +819,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 提案详情 ═══ -->
+<!-- 提案详情 -->
 <div class="view" id="view-proposal-detail">
   <div id="appNavSlot3"></div>
   <div class="app-layout">
@@ -797,7 +831,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 历史归档 ═══ -->
+<!-- 历史归档 -->
 <div class="view" id="view-history">
   <div id="appNavSlot4"></div>
   <div class="app-layout">
@@ -814,14 +848,14 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 成员管理 ═══ -->
+<!-- 成员管理 -->
 <div class="view" id="view-members">
   <div id="appNavSlot5"></div>
   <div class="app-layout">
     <aside class="app-sidebar" id="sidebarSlot5"></aside>
     <main class="app-main">
       <div class="page-head">
-        <div><h1>成员管理</h1><div class="sub page-member-sub">8 / 50 名成员 · 创建者可移除成员</div></div>
+        <div><h1>成员管理</h1><div class="sub page-member-sub">1 / 50 名成员 · 创建者可移除成员</div></div>
         <button class="btn btn-gold" onclick="go('invite')"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>邀请成员</button>
       </div>
       <div class="member-grid" id="memberGrid"></div>
@@ -829,7 +863,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 邀请成员 ═══ -->
+<!-- 邀请成员 -->
 <div class="view" id="view-invite">
   <div id="appNavSlot6"></div>
   <div class="app-layout">
@@ -839,14 +873,14 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
       <div class="page-head"><div><h1>邀请成员</h1><div class="sub">分享邀请链接或邀请码，朋友点击即可加入董事会</div></div></div>
       <div class="invite-panel">
         <div style="font-size:.85rem;color:var(--muted);margin-bottom:8px">邀请码</div>
-        <div class="invite-code" id="inviteCodeDisplay">PALM-2026</div>
+        <div class="invite-code" id="inviteCodeDisplay">PALM-0000</div>
         <div style="font-size:.85rem;color:var(--muted);margin-bottom:8px">邀请链接</div>
-        <div class="invite-link"><input type="text" readonly id="inviteLinkInput" value="https://palmboard.app/join/PALM-2026"><button class="btn btn-primary btn-sm" onclick="copyLink()">复制</button></div>
+        <div class="invite-link"><input type="text" readonly id="inviteLinkInput" value=""><button class="btn btn-primary btn-sm" onclick="copyLink()">复制</button></div>
         <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line-light)">
           <div style="font-size:.85rem;color:var(--muted);margin-bottom:12px">或通过以下方式分享</div>
-          <div style="display:flex;gap:10px;justify-content:center">
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" onclick="toast('已生成微信分享卡片','success')">微信分享</button>
-            <button class="btn btn-ghost btn-sm" onclick="toast('已复制到剪贴板','success')">复制文案</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyLink()">复制文案</button>
             <button class="btn btn-ghost btn-sm" onclick="toast('二维码已生成','success')">二维码</button>
           </div>
         </div>
@@ -856,19 +890,18 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
         </div>
         <div style="margin-top:24px;padding:20px;background:rgba(184,147,90,.05);border-radius:var(--r-card);text-align:left">
           <div style="font-size:.88rem;font-weight:700;margin-bottom:12px">好友加入流程</div>
-          <div style="display:flex;gap:12px;align-items:flex-start;font-size:.8rem;color:var(--muted);line-height:1.6">
-            <div style="flex:1"><div style="font-weight:700;color:var(--ink);margin-bottom:4px">① 点击邀请链接</div>未注册好友打开链接进入注册页，显示"正在加入「董事会名」"</div>
-            <div style="flex:1"><div style="font-weight:700;color:var(--ink);margin-bottom:4px">② 完成注册</div>填写昵称、邮箱、密码，提交后自动加入受邀董事会</div>
-            <div style="flex:1"><div style="font-weight:700;color:var(--ink);margin-bottom:4px">③ 自动进入</div>受邀董事会设为默认第一董事会，直接进入提案大厅</div>
+          <div style="display:flex;gap:12px;align-items:flex-start;font-size:.8rem;color:var(--muted);line-height:1.6;flex-direction:column;gap:10px">
+            <div><div style="font-weight:700;color:var(--ink);margin-bottom:4px">① 点击邀请链接</div>未注册好友打开链接进入注册页，显示"正在加入「董事会名」"</div>
+            <div><div style="font-weight:700;color:var(--ink);margin-bottom:4px">② 完成注册</div>填写昵称、邮箱、密码，提交后自动加入受邀董事会</div>
+            <div><div style="font-weight:700;color:var(--ink);margin-bottom:4px">③ 自动进入</div>受邀董事会设为默认第一董事会，直接进入提案大厅</div>
           </div>
-          <button class="btn btn-gold btn-sm" style="margin-top:16px" onclick="simulateFriendJoin()">模拟好友注册加入</button>
         </div>
       </div>
     </main>
   </div>
 </div>
 
-<!-- ═══ 个人中心 ═══ -->
+<!-- 个人中心 -->
 <div class="view" id="view-profile">
   <div id="appNavSlot7"></div>
   <div class="app-layout">
@@ -878,22 +911,22 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 
       <div class="profile-header">
         <div class="ph-top">
-          <div class="ph-avatar" id="profileAvatar" onclick="document.getElementById('avatarInput').click()" style="cursor:pointer" title="点击更换头像">V</div>
+          <div class="ph-avatar" id="profileAvatar" onclick="document.getElementById('avatarInput').click()" style="cursor:pointer" title="点击更换头像">U</div>
           <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/gif" style="display:none" onchange="handleAvatarUpload(event)">
           <div class="ph-info">
-            <h2 id="profileName">Vanca</h2>
-            <div class="ph-level" id="profileCurrentLevel"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M232,64H208V48a8,8,0,0,0-8-8H56a8,8,0,0,0-8,8V64H24A16,16,0,0,0,8,80V96a40,40,0,0,0,40,40h3.65A80.13,80.13,0,0,0,120,191.61V216H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V191.58c31.94-3.23,58.44-25.64,68.08-55.58H208a40,40,0,0,0,40-40V80A16,16,0,0,0,232,64Z"/></svg>当前董事会：L3 专业委员会主任</div>
+            <h2 id="profileName">用户</h2>
+            <div class="ph-level" id="profileCurrentLevel"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M232,64H208V48a8,8,0,0,0-8-8H56a8,8,0,0,0-8,8V64H24A16,16,0,0,0,8,80V96a40,40,0,0,0,40,40h3.65A80.13,80.13,0,0,0,120,191.61V216H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V191.58c31.94-3.23,58.44-25.64,68.08-55.58H208a40,40,0,0,0,40-40V80A16,16,0,0,0,232,64Z"/></svg>当前董事会：L1 董事</div>
           </div>
-          <button class="btn btn-light btn-sm" style="margin-left:auto" onclick="document.getElementById('accountSection').scrollIntoView({behavior:'smooth'})">编辑资料</button>
+          <button class="btn btn-light btn-sm" style="margin-left:auto;background:rgba(244,241,234,.15);color:#F4F1EA;border:1px solid rgba(244,241,234,.2)" onclick="go('account')">编辑资料</button>
         </div>
         <div class="ph-stats">
-          <div class="ph-stat"><div class="num" id="profileTotalProposals">23</div><div class="label">累计发起提案（全部董事会）</div></div>
-          <div class="ph-stat"><div class="num">3</div><div class="label">所属董事会</div></div>
-          <div class="ph-stat"><div class="num" id="profileBoardsCount">3</div><div class="label">创建的董事会</div></div>
+          <div class="ph-stat"><div class="num" id="profileTotalProposals">0</div><div class="label">累计发起提案（全部董事会）</div></div>
+          <div class="ph-stat"><div class="num" id="profileBoardsJoined">1</div><div class="label">所属董事会</div></div>
+          <div class="ph-stat"><div class="num" id="profileBoardsCreated">1</div><div class="label">创建的董事会</div></div>
         </div>
       </div>
 
-      <!-- 我的董事会列表：展示用户在各董事会的不同职级 -->
+      <!-- 我的董事会列表 -->
       <div class="my-boards-section">
         <h3>我的董事会（职级按董事会区分）</h3>
         <div id="myBoardsList"></div>
@@ -901,41 +934,19 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
 
       <!-- 当前董事会的职级详情 -->
       <div class="level-track" id="currentBoardLevelSection">
-        <h3 id="currentBoardLevelTitle">「Vanca 的董事会」职级进度</h3>
+        <h3 id="currentBoardLevelTitle">职级进度</h3>
         <div class="level-progress">
-          <div class="lp-label"><span id="levelFromTo">L3 专业委员会主任 → L4 副董事长</span><span class="current" id="levelGap">距 L4 还差 5 次提案</span></div>
-          <div class="lp-bar"><div class="lp-fill" id="levelFill" style="width:75%"></div></div>
+          <div class="lp-label"><span id="levelFromTo">L1 董事 → L2 执行董事</span><span class="current" id="levelGap">距 L2 还差 5 次提案</span></div>
+          <div class="lp-bar"><div class="lp-fill" id="levelFill" style="width:0%"></div></div>
         </div>
         <div class="level-cards" id="levelCards"></div>
         <div style="margin-top:20px;padding:16px;background:rgba(184,147,90,.06);border-radius:var(--r-control);font-size:.82rem;color:var(--muted);line-height:1.7" id="levelThreshold"></div>
-      </div>
-
-      <div class="card" style="padding:24px" id="accountSection">
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px">账户资料</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div class="input-group"><label>昵称 <span class="req">*</span></label><input class="input-field" id="editName" value="Vanca"></div>
-          <div class="input-group"><label>邮箱 <span class="req">*</span></label><input class="input-field" id="editEmail" value="vanca@example.com"></div>
-          <div class="input-group"><label>手机号</label><input class="input-field" id="editPhone" placeholder="请输入手机号" value="138****8888"></div>
-          <div class="input-group"><label>注册时间</label><input class="input-field" value="2026-09-01" readonly style="opacity:.6"></div>
-        </div>
-        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--line-light)">
-          <h4 style="font-size:.9rem;font-weight:700;margin-bottom:14px">修改密码</h4>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-            <div class="input-group"><label>当前密码</label><input class="input-field" type="password" id="editOldPwd" placeholder="输入当前密码"></div>
-            <div class="input-group"><label>新密码</label><input class="input-field" type="password" id="editNewPwd" placeholder="至少 6 位"></div>
-            <div class="input-group"><label>确认新密码</label><input class="input-field" type="password" id="editConfirmPwd" placeholder="再次输入新密码"></div>
-          </div>
-        </div>
-        <div style="margin-top:20px;display:flex;gap:10px">
-          <button class="btn btn-gold btn-sm" onclick="saveProfile()">保存修改</button>
-          <button class="btn btn-ghost btn-sm" onclick="resetProfileForm()">重置</button>
-        </div>
       </div>
     </main>
   </div>
 </div>
 
-<!-- ═══ 账户资料 ═══ -->
+<!-- 账户资料 -->
 <div class="view" id="view-account">
   <div id="appNavSlot8"></div>
   <div class="app-layout">
@@ -944,28 +955,28 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
       <div class="page-head"><div><h1>账户资料</h1><div class="sub">管理你的个人信息和账号安全</div></div></div>
       <div class="profile-header" style="margin-bottom:24px">
         <div class="ph-top">
-          <div class="ph-avatar" id="accountAvatar" onclick="document.getElementById('accountAvatarInput').click()" style="cursor:pointer" title="点击更换头像">V</div>
+          <div class="ph-avatar" id="accountAvatar" onclick="document.getElementById('accountAvatarInput').click()" style="cursor:pointer" title="点击更换头像">U</div>
           <input type="file" id="accountAvatarInput" accept="image/jpeg,image/png,image/gif" style="display:none" onchange="handleAvatarUpload(event)">
           <div class="ph-info">
-            <h2 id="accountName">Vanca</h2>
+            <h2 id="accountName">用户</h2>
             <div class="ph-level"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM128,72a32,32,0,1,0,32,32A32,32,0,0,0,128,72Z"/></svg>点击头像可上传自定义图片</div>
           </div>
         </div>
       </div>
       <div class="card" style="padding:24px">
         <h3 style="font-size:1rem;font-weight:700;margin-bottom:16px">基本信息</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div class="input-group"><label>昵称 <span class="req">*</span></label><input class="input-field" id="acctName" value="Vanca"></div>
-          <div class="input-group"><label>邮箱 <span class="req">*</span></label><input class="input-field" id="acctEmail" value="vanca@example.com"></div>
-          <div class="input-group"><label>手机号</label><input class="input-field" id="acctPhone" placeholder="请输入手机号" value="138****8888"></div>
-          <div class="input-group"><label>注册时间</label><input class="input-field" value="2026-09-01" readonly style="opacity:.6"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="account-form-grid">
+          <div class="input-group"><label>昵称 <span class="req">*</span></label><input class="input-field" id="acctName" value=""></div>
+          <div class="input-group"><label>邮箱 <span class="req">*</span></label><input class="input-field" id="acctEmail" value=""></div>
+          <div class="input-group"><label>手机号</label><input class="input-field" id="acctPhone" placeholder="请输入手机号"></div>
+          <div class="input-group"><label>注册时间</label><input class="input-field" id="acctJoinDate" readonly style="opacity:.6"></div>
         </div>
         <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--line-light)">
           <h4 style="font-size:.9rem;font-weight:700;margin-bottom:14px">修改密码</h4>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-            <div class="input-group"><label>当前密码</label><input class="input-field" type="password" id="acctOldPwd" placeholder="输入当前密码"></div>
-            <div class="input-group"><label>新密码</label><input class="input-field" type="password" id="acctNewPwd" placeholder="至少 6 位"></div>
-            <div class="input-group"><label>确认新密码</label><input class="input-field" type="password" id="acctConfirmPwd" placeholder="再次输入新密码"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px" class="pwd-form-grid">
+            <div class="input-group"><label>当前密码</label><input class="input-field" type="password" id="acctOldPwd" placeholder="输入当前密码" autocomplete="current-password"></div>
+            <div class="input-group"><label>新密码</label><input class="input-field" type="password" id="acctNewPwd" placeholder="至少 6 位" autocomplete="new-password"></div>
+            <div class="input-group"><label>确认新密码</label><input class="input-field" type="password" id="acctConfirmPwd" placeholder="再次输入新密码" autocomplete="new-password"></div>
           </div>
         </div>
         <div style="margin-top:20px;display:flex;gap:10px">
@@ -977,7 +988,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<!-- ═══ 我的职级 ═══ -->
+<!-- 我的职级 -->
 <div class="view" id="view-my-level">
   <div id="appNavSlot9"></div>
   <div class="app-layout">
@@ -986,29 +997,30 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
       <div class="page-head"><div><h1>我的职级体系</h1><div class="sub">职级按董事会维度独立计算，切换视角查看不同董事会的职级</div></div></div>
       <div class="profile-header" id="levelHeader">
         <div class="ph-top">
-          <div style="flex:1">
-            <div style="font-size:.82rem;opacity:.7;margin-bottom:6px">当前归属董事会：<span id="levelBoardName">Vanca 的董事会</span></div>
-            <div style="font-size:1.8rem;font-weight:800" id="levelTitle">L3 · 专业委员会主任</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.82rem;opacity:.7;margin-bottom:6px">当前归属董事会：<span id="levelBoardName">董事会</span></div>
+            <div style="font-size:1.6rem;font-weight:800" id="levelTitle">L1 · 董事</div>
           </div>
-          <button class="btn btn-light btn-sm" onclick="showLevelBoardSwitcher()">切换董事会视角</button>
+          <button class="btn btn-light btn-sm" style="background:rgba(244,241,234,.15);color:#F4F1EA;border:1px solid rgba(244,241,234,.2)" onclick="showLevelBoardSwitcher()">切换董事会视角</button>
         </div>
         <div class="ph-stats" style="margin-top:20px">
-          <div class="ph-stat"><div class="num" id="levelProposals">15</div><div class="label">累计发起提案</div></div>
-          <div class="ph-stat"><div class="num" id="levelPassRate">60%</div><div class="label">提案通过率</div></div>
-          <div class="ph-stat"><div class="num" id="levelBoardSize">8</div><div class="label">董事会规模</div></div>
+          <div class="ph-stat"><div class="num" id="levelProposals">0</div><div class="label">累计发起提案</div></div>
+          <div class="ph-stat"><div class="num" id="levelPassRate">0%</div><div class="label">提案通过率</div></div>
+          <div class="ph-stat"><div class="num" id="levelBoardSize">1</div><div class="label">董事会规模</div></div>
         </div>
       </div>
       <div class="card" style="padding:24px;margin-bottom:24px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <h3 style="font-size:.95rem;font-weight:700" id="levelProgressTitle">晋升进度（目标：L4 副董事长）</h3>
-          <span style="font-size:.82rem;color:var(--accent-dark);font-weight:600" id="levelProgressText">15 / 20 次提案</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <h3 style="font-size:.95rem;font-weight:700" id="levelProgressTitle">晋升进度（目标：L2 执行董事）</h3>
+          <span style="font-size:.82rem;color:var(--accent-dark);font-weight:600" id="levelProgressText">0 / 5 次提案</span>
         </div>
-        <div class="lp-bar" style="height:10px;background:var(--line-light);border-radius:999px;overflow:hidden"><div class="lp-fill" id="levelProgressFill" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border-radius:999px;width:75%"></div></div>
+        <div class="lp-bar" style="height:10px;background:var(--line-light);border-radius:999px;overflow:hidden"><div class="lp-fill" id="levelProgressFill" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border-radius:999px;width:0%"></div></div>
       </div>
       <div class="card" style="padding:24px">
         <h3 style="font-size:.95rem;font-weight:700;margin-bottom:8px">职级晋升门槛规则表</h3>
         <p style="font-size:.8rem;color:var(--muted);margin-bottom:16px">职级依据董事在特定董事会下的提案活跃度与通过率自动判定计算。</p>
-        <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.85px;min-width:500px">
           <thead><tr style="background:var(--canvas);text-align:left">
             <th style="padding:10px 14px;border-radius:8px 0 0 0">职级编号</th>
             <th style="padding:10px 14px">头衔名称</th>
@@ -1018,12 +1030,13 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
           </tr></thead>
           <tbody id="levelTableBody"></tbody>
         </table>
+        </div>
       </div>
     </main>
   </div>
 </div>
 
-<!-- ═══ 我的董事会 ═══ -->
+<!-- 我的董事会 -->
 <div class="view" id="view-my-boards">
   <div id="appNavSlot10"></div>
   <div class="app-layout">
@@ -1031,7 +1044,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
     <main class="app-main">
       <div class="page-head">
         <div><h1>我的董事会列表</h1><div class="sub">管理你参与的所有董事会，点击切换视角</div></div>
-        <div style="display:flex;gap:10px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" onclick="showJoinBoardModal()">加入董事会</button>
           <button class="btn btn-gold btn-sm" onclick="go('onboarding')">+ 创建新董事会</button>
         </div>
@@ -1041,6 +1054,923 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
   </div>
 </div>
 
-<script src="app.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   掌上董事会 · 正式环境单页应用
+   多董事会数据模型 · 响应式适配
+   ═══════════════════════════════════════════════════════════════ */
+
+const LEVELS = [
+  {lv:'L1', title:'董事', minCount:0,  minRate:0},
+  {lv:'L2', title:'执行董事', minCount:5,  minRate:50},
+  {lv:'L3', title:'专业委员会主任', minCount:10, minRate:55},
+  {lv:'L4', title:'副董事长', minCount:20, minRate:60},
+  {lv:'L5', title:'董事长', minCount:35, minRate:65},
+  {lv:'L6', title:'董事局主席', minCount:50, minRate:70},
+];
+
+const AV = ['#1E2630','#B8935A','#5A7A8A','#7A5A6A','#6A8A6A','#8A6A5A','#5A6A8A','#7A8A5A','#8A5A7A','#6A7A5A'];
+
+function makeVoters(names, avatars, votes) {
+  return names.map((n,i)=>({name:n, avatar:avatars[i%avatars.length], vote:votes[i]||'pending', reason:'', reasonImages:[]}));
+}
+
+const state = {
+  currentView: 'login',
+  currentUser: { id:'u1', name:'用户', email:'', phone:'', avatar:null, password:'' },
+  currentBoardId: null,
+  selectedType: 'consume',
+  selectedDeadline: '24h',
+  filterType: 'all',
+  historyFilter: 'all',
+  userVotes: {},
+  pendingInvite: null,
+  detailFromHistory: false,
+  proposalImages: [],
+  voteReasonImages: [],
+  notifications: [],
+  boards: [],
+  registeredEmails: [],
+};
+
+// ── 辅助 ──
+function currentBoard(){ return state.boards.find(b=>b.id===state.currentBoardId); }
+function currentUserInBoard(){ const b=currentBoard(); return b?b.members.find(m=>m.userId===state.currentUser.id):null; }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+// ── 视图切换 ──
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target=document.getElementById('view-'+view);
+  if(target){target.classList.add('active');state.currentView=view;}
+  const appViews=['board-home','create-proposal','proposal-detail','history','members','invite','profile','account','my-level','my-boards'];
+  if(appViews.includes(view)){
+    injectAppNav(); injectSidebar(view);
+  }
+  const tabbar=document.getElementById('mobileTabbar');
+  if(tabbar){
+    document.body.classList.toggle('is-app-page', appViews.includes(view));
+    tabbar.querySelectorAll('.mtab').forEach(t=>{
+      t.classList.remove('active');
+      if(t.dataset.view===view) t.classList.add('active');
+    });
+  }
+  closeModal();
+  document.getElementById('notifPanel').classList.remove('active');
+  window.scrollTo(0,0);
+  if(view==='board-home') renderProposals();
+  if(view==='history') renderHistory();
+  if(view==='members') renderMembers();
+  if(view==='profile') renderProfile();
+  if(view==='account') renderAccount();
+  if(view==='my-level') renderMyLevel();
+  if(view==='my-boards') renderMyBoards();
+  if(view==='invite') renderInvite();
+}
+
+function injectAppNav(){
+  const slots=['appNavSlot1','appNavSlot2','appNavSlot3','appNavSlot4','appNavSlot5','appNavSlot6','appNavSlot7','appNavSlot8','appNavSlot9','appNavSlot10'];
+  const template=document.getElementById('appNavTemplate');
+  slots.forEach(id=>{
+    const slot=document.getElementById(id);
+    if(slot && slot.children.length===0) slot.appendChild(template.content.cloneNode(true));
+  });
+  updateBoardContext();
+  updateNavAvatar();
+}
+
+function injectSidebar(view){
+  const source=document.querySelector('#view-board-home .app-sidebar');
+  if(!source) return;
+  const targets=['sidebarSlot2','sidebarSlot3','sidebarSlot4','sidebarSlot5','sidebarSlot6','sidebarSlot7','sidebarSlot8','sidebarSlot9','sidebarSlot10'];
+  targets.forEach(id=>{
+    const slot=document.getElementById(id);
+    if(slot && slot.children.length===0){
+      const clone=source.cloneNode(true);
+      clone.querySelectorAll('.side-link').forEach(l=>l.classList.remove('active'));
+      const linkMap={'create-proposal':0,'proposal-detail':0,'history':1,'members':2,'invite':3,'account':4,'my-level':5,'my-boards':6,'profile':4};
+      const idx=linkMap[view];
+      if(idx!==undefined && clone.querySelectorAll('.side-link')[idx]) clone.querySelectorAll('.side-link')[idx].classList.add('active');
+      slot.appendChild(clone);
+    }
+  });
+  updateBoardContext();
+}
+
+function updateBoardContext(){
+  const b=currentBoard();
+  if(!b) return;
+  const me=currentUserInBoard();
+  const totalProps=b.proposals.length+b.history.length;
+  document.querySelectorAll('.nav-board-name').forEach(el=>el.textContent=b.name);
+  document.querySelectorAll('.nav-board-level').forEach(el=>el.textContent=me?me.level:'L1');
+  document.querySelectorAll('.side-board-name').forEach(el=>{
+    el.innerHTML=`${b.name} <span class="tag tag-gold side-board-tag" style="font-size:.6rem;padding:2px 7px">${me?me.level:'L1'}</span>`;
+  });
+  document.querySelectorAll('.side-board-role').forEach(el=>el.textContent=me?me.level+' '+(LEVELS.find(l=>l.lv===me.level)?.title||'董事'):'董事');
+  document.querySelectorAll('.side-board-count').forEach(el=>el.textContent=`${b.members.length} 名成员 · ${totalProps} 份提案`);
+  document.querySelectorAll('.side-proposal-count').forEach(el=>el.textContent=b.proposals.length);
+  document.querySelectorAll('.side-history-count').forEach(el=>el.textContent=b.history.length);
+  document.querySelectorAll('.side-member-count').forEach(el=>el.textContent=b.members.length);
+  const sub=document.querySelector('.page-head-sub');
+  if(sub) sub.textContent=`${b.proposals.length} 个提案正在投票中 · 达到门槛即自动出决议`;
+  const msub=document.querySelector('.page-member-sub');
+  if(msub) msub.textContent=`${b.members.length} / 50 名成员 · 创建者可移除成员`;
+}
+
+// ── 认证 ──
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pwd=document.getElementById('loginPwd').value;
+  if(!email){toast('请输入邮箱','info');return;}
+  if(!pwd){toast('请输入密码','info');return;}
+  state.currentUser.email=email;
+  state.currentUser.password=pwd;
+  toast('登录成功，欢迎回来','success');
+  setTimeout(()=>{
+    // 首次登录或无董事会时引导创建
+    if(state.boards.length===0){ go('onboarding'); }
+    else { go('board-home'); }
+  },600);
+}
+
+function doRegister(){
+  const name=document.getElementById('regName').value.trim();
+  const email=document.getElementById('regEmail').value.trim();
+  const pwd=document.getElementById('regPwd').value;
+  if(!name){toast('请输入昵称','info');return;}
+  if(!email||!email.includes('@')){toast('请输入有效邮箱','info');return;}
+  if(!pwd||pwd.length<6){toast('密码至少 6 位','info');return;}
+  state.currentUser.name=name;
+  state.currentUser.email=email;
+  state.currentUser.password=pwd;
+  state.registeredEmails.push(email);
+  if(state.pendingInvite){
+    toast('注册成功！正在加入受邀董事会...','success');
+    setTimeout(()=>{completeInviteRegister();go('board-home');},800);
+  }else{
+    toast('注册成功！请创建你的第一个董事会','success');
+    setTimeout(()=>go('onboarding'),600);
+  }
+}
+
+function verifyForgotEmail(){
+  const email=document.getElementById('forgotEmail').value.trim();
+  const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!email){toast('请输入邮箱地址','info');return;}
+  if(!emailRegex.test(email)){toast('邮箱格式不正确','error');return;}
+  document.getElementById('forgotStep1').style.display='none';
+  document.getElementById('forgotStep2').style.display='block';
+}
+
+function resetPassword(){
+  const p1=document.getElementById('newPwd').value;
+  const p2=document.getElementById('confirmNewPwd').value;
+  if(!p1||p1.length<6){toast('密码至少 6 位','info');return;}
+  if(p1!==p2){toast('两次输入的密码不一致','info');return;}
+  toast('密码重置成功，请使用新密码登录','success');
+  document.getElementById('forgotStep1').style.display='block';
+  document.getElementById('forgotStep2').style.display='none';
+  document.getElementById('forgotEmail').value='';
+  document.getElementById('newPwd').value='';
+  document.getElementById('confirmNewPwd').value='';
+  setTimeout(()=>go('login'),800);
+}
+
+function createBoardFromOnboarding(){
+  const name=document.getElementById('boardName').value.trim();
+  const desc=document.getElementById('boardDesc').value.trim();
+  if(!name){toast('请输入董事会名称','info');return;}
+  const newId='b'+Date.now();
+  state.boards.push({
+    id:newId, name, desc:desc||'', creatorId:state.currentUser.id,
+    inviteCode:'PALM-'+Math.random().toString(36).substr(2,4).toUpperCase(),
+    dotColor:'#'+Math.floor(Math.random()*0x888888+0x444444).toString(16),
+    members:[{userId:state.currentUser.id, name:state.currentUser.name, avatar:AV[0], role:'创建者', level:'L1', proposalsCount:0, passRate:0, joined:todayStr()}],
+    proposals:[], history:[],
+  });
+  state.currentBoardId=newId;
+  toast('董事会创建成功！','success');
+  document.getElementById('boardName').value='';
+  document.getElementById('boardDesc').value='';
+  setTimeout(()=>go('board-home'),600);
+}
+
+function doLogout(){ toast('已退出登录','info'); go('login'); }
+
+// ── 董事会切换 ──
+function showBoardSwitcher(){
+  const b=currentBoard();
+  const items=state.boards.map(bd=>{
+    const me=bd.members.find(m=>m.userId===state.currentUser.id);
+    const total=bd.proposals.length+bd.history.length;
+    const isActive=bd.id===state.currentBoardId;
+    return `<div class="bs-item ${isActive?'active':''}" onclick="switchBoard('${bd.id}')">
+      <span class="bs-dot" style="background:${bd.dotColor}"></span>
+      <div class="bs-info">
+        <div class="bs-name">${bd.name}${bd.creatorId===state.currentUser.id?'<span class="tag tag-muted" style="font-size:.6rem;padding:1px 6px">我创建的</span>':''}</div>
+        <div class="bs-meta">${bd.members.length} 名成员 · ${total} 份提案</div>
+      </div>
+      ${isActive?'<span class="bs-current-tag">当前</span>':`<span class="bs-level">${me?me.level:'L1'}</span>`}
+    </div>`;
+  }).join('');
+  showModal(`
+    <div class="board-switch-modal">
+      <h3>切换董事会</h3>
+      ${items}
+      <div class="bs-create-btn" onclick="closeModal();go('onboarding')">
+        <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>
+        创建新董事会
+      </div>
+    </div>
+  `);
+}
+
+function switchBoard(boardId){
+  state.currentBoardId=boardId;
+  const b=currentBoard();
+  closeModal();
+  toast(`已切换到「${b.name}」`,'success');
+  updateBoardContext();
+  if(state.currentView==='board-home') renderProposals();
+  if(state.currentView==='history') renderHistory();
+  if(state.currentView==='members') renderMembers();
+  if(state.currentView==='profile') renderProfile();
+  if(state.currentView==='invite') renderInvite();
+}
+
+// ── 提案列表 ──
+function renderProposals(){
+  const b=currentBoard();
+  if(!b) return;
+  const list=document.getElementById('proposalList');
+  let filtered=b.proposals;
+  if(state.filterType!=='all') filtered=filtered.filter(p=>p.type===state.filterType);
+  if(filtered.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="es-icon"><svg width="28" height="28" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34Z"/></svg></div><h3>暂无投票中的提案</h3><p>发起第一个提案，让董事会帮你拍板</p><button class="btn btn-gold btn-sm" onclick="go('create-proposal')">发起提案</button></div>`;
+    return;
+  }
+  const typeIcon={consume:'🛒',travel:'✈️',other:'📋'};
+  const total=b.members.length;
+  list.innerHTML=filtered.map(p=>{
+    const voted=state.userVotes[p.id];
+    const yesPct=Math.round(p.yes/total*100);
+    const noPct=Math.round(p.no/total*100);
+    const btnText=voted?'修改投票':'参与投票';
+    const btnClass=voted?'btn-outline-gold':'btn-gold';
+    return `<div class="proposal-row" onclick="openProposal(${p.id})">
+      <div class="pr-type ${p.type}">${typeIcon[p.type]}</div>
+      <div class="pr-info">
+        <div class="pr-title">${p.title}</div>
+        <div class="pr-meta"><span>${p.amount}</span><span>截止 ${p.deadline}</span>${voted?`<span style="color:var(--accent-dark);font-weight:600">已投${voted==='yes'?'通过':'反对'}</span>`:''}</div>
+      </div>
+      <div class="pr-vote">
+        <div class="pr-vote-bar"><div class="yes" style="width:${yesPct}%"></div><div class="no" style="width:${noPct}%"></div></div>
+        <div class="pr-vote-text">${p.yes} 通过 · ${p.no} 反对 · ${total-p.yes-p.no} 未投</div>
+      </div>
+      <button class="btn ${btnClass} btn-sm pr-action" onclick="event.stopPropagation();openProposal(${p.id})">${btnText}</button>
+    </div>`;
+  }).join('');
+}
+
+function filterProps(el,type){
+  document.querySelectorAll('#view-board-home .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); state.filterType=type; renderProposals();
+}
+
+// ── 历史 ──
+function renderHistory(){
+  const b=currentBoard();
+  if(!b) return;
+  const list=document.getElementById('historyList');
+  let filtered=b.history;
+  if(state.historyFilter!=='all') filtered=filtered.filter(p=>p.status===state.historyFilter);
+  const typeIcon={consume:'🛒',travel:'✈️',other:'📋'};
+  const total=b.members.length;
+  if(filtered.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="es-icon"><svg width="28" height="28" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></div><h3>暂无已决议提案</h3><p>投票截止并达标的提案会自动归档到这里</p></div>`;
+    return;
+  }
+  list.innerHTML=filtered.map(p=>{
+    const yesPct=Math.round(p.yes/total*100);
+    const noPct=Math.round(p.no/total*100);
+    const statusTag=p.status==='passed'?'<span class="tag tag-success">已通过</span>':'<span class="tag tag-danger">未通过</span>';
+    return `<div class="proposal-row" onclick="openHistoryProposal(${p.id})">
+      <div class="pr-type ${p.type}">${typeIcon[p.type]}</div>
+      <div class="pr-info"><div class="pr-title">${p.title}</div><div class="pr-meta"><span>${p.amount}</span><span>${p.deadline} 决议</span></div></div>
+      <div class="pr-vote"><div class="pr-vote-bar"><div class="yes" style="width:${yesPct}%"></div><div class="no" style="width:${noPct}%"></div></div><div class="pr-vote-text">${p.yes} 通过 · ${p.no} 反对</div></div>
+      ${statusTag}
+    </div>`;
+  }).join('');
+}
+
+function filterHistory(el,type){
+  document.querySelectorAll('#view-history .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); state.historyFilter=type; renderHistory();
+}
+
+// ── 提案详情 ──
+function openProposal(id){
+  const p=currentBoard().proposals.find(x=>x.id===id);
+  if(!p) return;
+  state.detailFromHistory=false;
+  renderProposalDetail(p,'voting'); go('proposal-detail');
+}
+
+function openHistoryProposal(id){
+  const p=currentBoard().history.find(x=>x.id===id);
+  if(!p) return;
+  const b=currentBoard();
+  state.detailFromHistory=true;
+  const sampleReasons=[
+    {text:'方案很成熟，支持通过。',imgs:[]},
+    {text:'整体方向没问题。',imgs:[]},
+    {text:'之前有类似经验，可行性很高。',imgs:[]},
+    {text:'时间安排合理。',imgs:[]},
+    {text:'性价比不错。',imgs:[]},
+    {text:'不太建议，风险点没有考虑充分。',imgs:[]},
+    {text:'反对，时机不太对。',imgs:[]},
+  ];
+  if(!p.voters||p.voters.length===0){
+    p.voters=b.members.map((m,i)=>{
+      const isNo=p.status==='rejected'&&(i===0||i===2);
+      const r=sampleReasons[isNo?5+i%2:i%5];
+      return {name:m.name,avatar:m.avatar,vote:isNo?'no':'yes',reason:r.text,reasonImages:[]};
+    });
+  }
+  renderProposalDetail(p,p.status); go('proposal-detail');
+}
+
+function renderProposalDetail(p,status){
+  const b=currentBoard();
+  const total=b.members.length;
+  const backBtn=document.querySelector('#view-proposal-detail .detail-back');
+  if(backBtn){
+    const backSvg='<svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>';
+    if(state.detailFromHistory){
+      backBtn.innerHTML=backSvg+'返回已决议';
+      backBtn.onclick=()=>go('history');
+    }else{
+      backBtn.innerHTML=backSvg+'返回提案大厅';
+      backBtn.onclick=()=>go('board-home');
+    }
+  }
+  const opinionTitle=state.detailFromHistory?'董事表决意见':'董事表决详情';
+  const typeLabel={consume:'消费',travel:'出行',other:'其他'};
+  const typeIcon={consume:'🛒',travel:'✈️',other:'📋'};
+  const voted=state.userVotes[p.id];
+  const yesPct=Math.round(p.yes/total*100);
+  const noPct=Math.round(p.no/total*100);
+  const pending=total-p.yes-p.no;
+  const statusHeader=status==='voting'?`<span class="tag tag-gold">投票中 · 截止 ${p.deadline}</span>`:status==='passed'?`<span class="tag tag-success">✓ 已通过 · ${p.deadline} 出决议</span>`:`<span class="tag tag-danger">✗ 未通过 · ${p.deadline} 出决议</span>`;
+  let voteActions='';
+  if(status==='voting'){
+    if(voted){
+      const yesDisabled=voted==='yes';
+      const noDisabled=voted==='no';
+      voteActions=`
+      <div style="margin-bottom:12px;padding:10px 14px;background:rgba(184,147,90,.06);border-radius:var(--r-control);font-size:.85rem;color:var(--accent-dark);font-weight:600;text-align:center">你已投「${voted==='yes'?'通过':'反对'}」票 · 点击反向按钮可修改意见</div>
+      <div class="vote-actions">
+        <button class="vote-btn yes ${yesDisabled?'voted-fixed':''}" onclick="${yesDisabled?'':`confirmChangeVote(${p.id},'yes')`}" ${yesDisabled?'disabled':''}><svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>${yesDisabled?'✓ 已通过':'通过'}</button>
+        <button class="vote-btn no ${noDisabled?'voted-fixed':''}" onclick="${noDisabled?'':`confirmChangeVote(${p.id},'no')`}" ${noDisabled?'disabled':''}><svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M205.66,194.34a8,8,0,0,1-11.32,0L128,128l-66.34,66.34a8,8,0,0,1-11.32-11.32L116.69,116.8,50.34,50.34A8,8,0,0,1,61.66,39L128,105.37l66.34-66.34a8,8,0,0,1,11.32,11.32L139.31,116.8l66.35,66.22A8,8,0,0,1,205.66,194.34Z"/></svg>${noDisabled?'✓ 已反对':'反对'}</button>
+      </div>`;
+    }else{
+      voteActions=`
+      <div class="vote-actions">
+        <button class="vote-btn yes" onclick="castVote(${p.id},'yes')"><svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>通过</button>
+        <button class="vote-btn no" onclick="castVote(${p.id},'no')"><svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M205.66,194.34a8,8,0,0,1-11.32,0L128,128l-66.34,66.34a8,8,0,0,1-11.32-11.32L116.69,116.8,50.34,50.34A8,8,0,0,1,61.66,39L128,105.37l66.34-66.34a8,8,0,0,1,11.32,11.32L139.31,116.8l66.35,66.22A8,8,0,0,1,205.66,194.34Z"/></svg>反对</button>
+      </div>`;
+    }
+  }else if(status==='rejected'){
+    voteActions=`<div style="padding:16px;background:rgba(160,74,58,.06);border-radius:var(--r-control);text-align:center"><p style="font-size:.88rem;color:var(--danger);margin-bottom:12px">截止时未达通过门槛，提案未通过</p><button class="btn btn-gold btn-sm" onclick="repropose(${p.id})">一键重新发起</button></div>`;
+  }else{
+    voteActions=`<div style="padding:16px;background:rgba(58,122,74,.06);border-radius:var(--r-control);text-align:center;font-size:.88rem;color:var(--success);font-weight:600">✓ 决议已生效，提案归档（只读）</div>`;
+  }
+  const votersHtml=p.voters.map(v=>{
+    const st=v.vote==='yes'?'<span class="voter-status yes">通过</span>':v.vote==='no'?'<span class="voter-status no">反对</span>':'<span class="voter-status pending">未表决</span>';
+    const reasonImgs=(v.reasonImages&&v.reasonImages.length)?`<div class="voter-reason-imgs">${v.reasonImages.map(src=>`<img src="${src}" alt="理由配图" onclick="window.open(this.src)">`).join('')}</div>`:'';
+    return `<div class="voter-row"><div class="voter-avatar" style="background:${v.avatar}">${v.name[0]}</div><div class="voter-info"><div class="voter-name">${v.name}</div>${v.reason?`<div class="voter-reason">"${v.reason}"</div>`:''}${reasonImgs}</div>${st}</div>`;
+  }).join('');
+  document.getElementById('proposalDetailContent').innerHTML=`
+    <div class="detail-header">
+      <div class="dh-top"><div><div style="margin-bottom:10px"><span class="tag tag-dark">${typeIcon[p.type]} ${typeLabel[p.type]}</span></div><h1>${p.title}</h1></div>${statusHeader}</div>
+      <div class="detail-meta"><span class="dm-item"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg> ${p.amount}</span><span class="dm-item"><svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92Z"/></svg> ${total} 名董事</span><span class="dm-item">发起人 ${p.voters[0]?p.voters[0].name:state.currentUser.name}</span></div>
+      ${p.desc?`<div class="detail-desc">${p.desc}</div>`:''}
+      ${p.images&&p.images.length?`<div class="detail-images">${p.images.map(src=>`<img src="${src}" alt="提案配图" onclick="window.open(this.src)">`).join('')}</div>`:''}
+    </div>
+    <div class="vote-panel">
+      <h3>表决进度</h3>
+      <div class="vote-result-bar"><div class="vr-yes" style="width:${yesPct}%">${p.yes} 通过</div><div class="vr-no" style="width:${Math.max(noPct,8)}%">${p.no} 反对</div></div>
+      <div class="vote-stats"><span>参与率 <strong>${Math.round((p.yes+p.no)/total*100)}%</strong></span><span>通过率 <strong>${p.yes+p.no>0?Math.round(p.yes/(p.yes+p.no)*100):0}%</strong></span><span>待表决 <strong>${pending}</strong> 人</span></div>
+      ${voteActions}
+    </div>
+    <div class="card" style="padding:24px 28px"><h3 style="font-size:1rem;font-weight:700;margin-bottom:16px">${opinionTitle}</h3><div class="voter-list">${votersHtml}</div></div>
+    ${status==='voting'?`<div style="margin-top:16px;text-align:right"><button class="btn btn-danger btn-sm" onclick="withdrawProposal(${p.id})">撤回提案</button></div>`:''}
+  `;
+}
+
+// ── 投票 ──
+function confirmChangeVote(id,vote){
+  const p=currentBoard().proposals.find(x=>x.id===id);
+  if(!p) return;
+  const oldVote=state.userVotes[id];
+  const newLabel=vote==='yes'?'通过':'反对';
+  const oldLabel=oldVote==='yes'?'通过':'反对';
+  showModal(`<h3>是否要修改意见？</h3><p class="modal-sub">你当前投的是「${oldLabel}」，确认改为「${newLabel}」吗？修改后原票数将同步更新。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="closeModal();castVote(${id},'${vote}',true)">确认修改</button></div>`);
+}
+
+function castVote(id,vote,isChange){
+  const p=currentBoard().proposals.find(x=>x.id===id);
+  if(!p) return;
+  state.voteReasonImages=[];
+  const isYes=vote==='yes';
+  const title=isChange?(isYes?'修改为通过（补充理由可选）':'修改为反对（补充理由可选）'):(isYes?'补充通过理由（可选）':'补充反对理由（可选）');
+  const placeholder=isYes?'说说为什么赞成...':'说说为什么不赞成...';
+  const btnClass=isYes?'btn-gold':'btn-danger';
+  const btnText=isChange?(isYes?'确认改为通过':'确认改为反对'):(isYes?'确认通过':'确认反对');
+  showModal(`<h3>${title}</h3><p class="modal-sub">填写理由可以帮助发起人理解你的想法，也可以直接提交不填理由。</p><textarea class="input-field" id="voteReason" placeholder="${placeholder}" style="min-height:80px"></textarea><div style="margin-top:14px"><div class="img-upload-zone" onclick="document.getElementById('voteImageInput').click()" style="padding:14px"><svg width="22" height="22" viewBox="0 0 256 256" fill="currentColor"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM160,96a8,8,0,0,1,8-8h32a8,8,0,0,1,0,16H168A8,8,0,0,1,160,96Zm-32,16a32,32,0,1,0,32,32A32,32,0,0,0,128,112Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,128,160Z"/></svg><div class="uz-text" style="font-size:.8rem">添加理由配图（最多3张）</div></div><input type="file" id="voteImageInput" accept="image/jpeg,image/png,image/gif" multiple style="display:none" onchange="handleVoteImages(event)"><div class="img-preview-grid" id="voteImagePreview" style="grid-template-columns:repeat(3,1fr)"></div></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-ghost" onclick="confirmVote(${id},'${vote}')">直接提交</button><button class="btn ${btnClass}" onclick="confirmVote(${id},'${vote}')">${btnText}</button></div>`);
+}
+
+function confirmVote(id,vote){
+  const p=currentBoard().proposals.find(x=>x.id===id);
+  if(!p) return;
+  const reason=document.getElementById('voteReason')?.value||'';
+  const reasonImages=[...state.voteReasonImages];
+  const oldVote=state.userVotes[id];
+  if(oldVote){
+    if(oldVote==='yes') p.yes=Math.max(0,p.yes-1);
+    else p.no=Math.max(0,p.no-1);
+  }
+  if(vote==='yes') p.yes++; else p.no++;
+  const voter=p.voters.find(v=>v.name===state.currentUser.name);
+  if(voter){voter.vote=vote;voter.reason=reason;voter.reasonImages=reasonImages;}
+  state.userVotes[id]=vote;
+  state.voteReasonImages=[];
+  closeModal();
+  toast(oldVote?`已修改为「${vote==='yes'?'通过':'反对'}」票`:`已投「${vote==='yes'?'通过':'反对'}」票`,'success');
+  renderProposalDetail(p,'voting');
+}
+
+function repropose(id){
+  const p=currentBoard().history.find(x=>x.id===id);
+  toast(`已复制「${p.title}」为新提案`,'success');
+  setTimeout(()=>go('create-proposal'),500);
+}
+
+function withdrawProposal(id){
+  showModal(`<h3>确认撤回提案？</h3><p class="modal-sub">撤回后提案将移入归档，当前投票记录将保留。你可以随时重新发起。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">再想想</button><button class="btn btn-danger" onclick="confirmWithdraw()">确认撤回</button></div>`);
+}
+function confirmWithdraw(){ closeModal(); toast('提案已撤回','success'); setTimeout(()=>go('board-home'),500); }
+
+// ── 图片上传 ──
+function handlePropImages(e){
+  const files=Array.from(e.target.files);
+  const remaining=3-state.proposalImages.length;
+  if(files.length>remaining){toast(`最多上传3张图片，还可添加${remaining}张`,'info');}
+  files.slice(0,remaining).forEach(file=>{
+    if(file.size>5*1024*1024){toast(`${file.name}超过5MB，已跳过`,'info');return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{state.proposalImages.push(ev.target.result);renderPropImagePreview();};
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+function renderPropImagePreview(){
+  const grid=document.getElementById('propImagePreview');
+  if(!grid) return;
+  grid.innerHTML=state.proposalImages.map((src,i)=>`
+    <div class="img-preview-item">
+      <img src="${src}" alt="配图${i+1}">
+      <button class="img-preview-remove" onclick="removePropImage(${i})">×</button>
+    </div>`).join('');
+}
+function removePropImage(i){ state.proposalImages.splice(i,1);renderPropImagePreview(); }
+
+function handleVoteImages(e){
+  const files=Array.from(e.target.files);
+  const remaining=3-state.voteReasonImages.length;
+  if(files.length>remaining){toast(`最多上传3张图片，还可添加${remaining}张`,'info');}
+  files.slice(0,remaining).forEach(file=>{
+    if(file.size>5*1024*1024){toast(`${file.name}超过5MB，已跳过`,'info');return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{state.voteReasonImages.push(ev.target.result);renderVoteImagePreview();};
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+function renderVoteImagePreview(){
+  const grid=document.getElementById('voteImagePreview');
+  if(!grid) return;
+  grid.innerHTML=state.voteReasonImages.map((src,i)=>`
+    <div class="img-preview-item">
+      <img src="${src}" alt="理由配图${i+1}">
+      <button class="img-preview-remove" onclick="removeVoteImage(${i})">×</button>
+    </div>`).join('');
+}
+function removeVoteImage(i){ state.voteReasonImages.splice(i,1);renderVoteImagePreview(); }
+
+// ── 发起提案 ──
+function selectType(el,type){ document.querySelectorAll('.type-option').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); state.selectedType=type; }
+function selectDeadline(el,val){ document.querySelectorAll('.deadline-opt').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); state.selectedDeadline=val; }
+document.addEventListener('input',function(e){ if(e.target.id==='propTitle') document.getElementById('titleCount').textContent=e.target.value.length+'/50'; });
+
+function submitProposal(){
+  const title=document.getElementById('propTitle').value.trim();
+  if(!title){toast('请填写提案标题','info');return;}
+  const b=currentBoard();
+  const amount=document.getElementById('propAmount').value;
+  const desc=document.getElementById('propDesc').value;
+  const newProp={
+    id:Date.now(), type:state.selectedType, title,
+    amount:amount?('¥'+amount):(state.selectedType==='travel'?'待定':'—'),
+    deadline:state.selectedDeadline, desc, status:'voting', yes:0, no:0,
+    images:[...state.proposalImages],
+    voters:b.members.map(m=>({name:m.name,avatar:m.avatar,vote:'pending',reason:'',reasonImages:[]})),
+  };
+  b.proposals.unshift(newProp);
+  toast(`提案发布成功！已通知 ${b.members.length} 名董事`,'success');
+  document.getElementById('propTitle').value='';
+  document.getElementById('propAmount').value='';
+  document.getElementById('propDesc').value='';
+  document.getElementById('titleCount').textContent='0/50';
+  state.proposalImages=[];
+  renderPropImagePreview();
+  updateBoardContext();
+  setTimeout(()=>openProposal(newProp.id),600);
+}
+
+// ── 成员管理 ──
+function renderMembers(){
+  const b=currentBoard();
+  if(!b) return;
+  const grid=document.getElementById('memberGrid');
+  grid.innerHTML=b.members.map(m=>`
+    <div class="member-card">
+      <div class="mc-avatar" style="background:${m.avatar}">${m.name[0]}</div>
+      <div class="mc-info">
+        <div class="mc-name">${m.name} ${m.role==='创建者'?'<span class="tag tag-gold" style="font-size:.6rem;padding:1px 6px">创建者</span>':''}</div>
+        <div class="mc-role">${m.level} ${LEVELS.find(l=>l.lv===m.level)?.title||''}</div>
+        <div class="mc-joined">加入于 ${m.joined} · 发起 ${m.proposalsCount} 次提案</div>
+      </div>
+      ${m.userId!==state.currentUser.id && b.creatorId===state.currentUser.id?`<button class="mc-remove" onclick="removeMember('${m.userId}')" title="移除成员"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>`:''}
+    </div>
+  `).join('');
+}
+
+function removeMember(userId){
+  const b=currentBoard();
+  const m=b.members.find(x=>x.userId===userId);
+  showModal(`<h3>移除成员</h3><p class="modal-sub">确定要将 <strong>${m.name}</strong> 移出「${b.name}」吗？移除后该成员将失去访问权。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-danger" onclick="confirmRemove('${userId}')">确认移除</button></div>`);
+}
+function confirmRemove(userId){
+  const b=currentBoard();
+  b.members=b.members.filter(m=>m.userId!==userId);
+  closeModal(); toast('成员已移除','success'); renderMembers(); updateBoardContext();
+}
+
+// ── 邀请 ──
+function renderInvite(){
+  const b=currentBoard();
+  if(!b) return;
+  document.getElementById('inviteCodeDisplay').textContent=b.inviteCode;
+  document.getElementById('inviteLinkInput').value=location.origin+'/join/'+b.inviteCode;
+}
+function copyLink(){
+  const input=document.getElementById('inviteLinkInput');
+  input.select();
+  input.setSelectionRange(0,99999);
+  try{ navigator.clipboard.writeText(input.value); }catch(e){ document.execCommand('copy'); }
+  toast('邀请链接已复制到剪贴板','success');
+}
+function resetInvite(){
+  showModal(`<h3>重置邀请链接？</h3><p class="modal-sub">重置后当前邀请链接和邀请码将立即失效，需要重新生成并分享。已加入的成员不受影响。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-danger" onclick="doResetInvite()">确认重置</button></div>`);
+}
+function doResetInvite(){
+  const b=currentBoard();
+  b.inviteCode='PALM-'+Math.random().toString(36).substr(2,4).toUpperCase();
+  closeModal(); renderInvite(); toast('邀请链接已重置','success');
+}
+
+// ── 个人中心 ──
+function renderProfile(){
+  const b=currentBoard();
+  if(!b) return;
+  const me=currentUserInBoard();
+
+  const myBoardsHtml=state.boards.map(bd=>{
+    const m=bd.members.find(x=>x.userId===state.currentUser.id);
+    const isCurrent=bd.id===state.currentBoardId;
+    const lvl=m?m.level:'L1';
+    const title=LEVELS.find(l=>l.lv===lvl)?.title||'董事';
+    return `<div class="my-board-card" onclick="switchBoard('${bd.id}');go('board-home')">
+      <span class="mb-dot" style="background:${bd.dotColor}"></span>
+      <div class="mb-info">
+        <div class="mb-name">${bd.name}${bd.creatorId===state.currentUser.id?'<span class="tag tag-muted" style="font-size:.6rem;padding:1px 6px">我创建的</span>':''}${isCurrent?'<span class="mb-current">当前</span>':''}</div>
+        <div class="mb-meta">${bd.members.length} 名成员 · ${bd.proposals.length+bd.history.length} 份提案 · 加入于 ${m?m.joined:'—'}</div>
+      </div>
+      <div class="mb-level">
+        <div class="mbl-tag">${lvl} ${title}</div>
+        <div class="mbl-role">${m?m.proposalsCount+' 次提案 · '+m.passRate+'% 通过率':'—'}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('myBoardsList').innerHTML=myBoardsHtml;
+
+  document.getElementById('currentBoardLevelTitle').textContent=`「${b.name}」职级进度`;
+  const myLevel=me?me.level:'L1';
+  const myCount=me?me.proposalsCount:0;
+  const myRate=me?me.passRate:0;
+  const plEl=document.getElementById('profileCurrentLevel');
+  if(plEl) plEl.innerHTML=`<svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M232,64H208V48a8,8,0,0,0-8-8H56a8,8,0,0,0-8,8V64H24A16,16,0,0,0,8,80V96a40,40,0,0,0,40,40h3.65A80.13,80.13,0,0,0,120,191.61V216H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V191.58c31.94-3.23,58.44-25.64,68.08-55.58H208a40,40,0,0,0,40-40V80A16,16,0,0,0,232,64Z"/></svg>当前董事会：${myLevel} ${LEVELS.find(l=>l.lv===myLevel)?.title||'董事'}`;
+  const curIdx=LEVELS.findIndex(l=>l.lv===myLevel);
+  const next=LEVELS[curIdx+1];
+  if(next){
+    document.getElementById('levelFromTo').textContent=`${myLevel} ${LEVELS[curIdx].title} → ${next.lv} ${next.title}`;
+    document.getElementById('levelGap').textContent=myCount>=next.minCount?`通过率还差 ${next.minRate-myRate}%`:`距 ${next.lv} 还差 ${next.minCount-myCount} 次提案`;
+    const pct=Math.min(100,Math.round(myCount/next.minCount*100));
+    document.getElementById('levelFill').style.width=pct+'%';
+    document.getElementById('levelThreshold').innerHTML=`<strong style="color:var(--accent-dark)">下一级门槛（${next.lv} ${next.title}）：</strong>本董事会内累计已出决议提案 ≥ ${next.minCount} 次（当前 ${myCount} 次）且通过率 ≥ ${next.minRate}%（当前 ${myRate}%）。`;
+  }else{
+    document.getElementById('levelFromTo').textContent=`${myLevel} ${LEVELS[curIdx].title}（最高级）`;
+    document.getElementById('levelGap').textContent='已达最高职级';
+    document.getElementById('levelFill').style.width='100%';
+    document.getElementById('levelThreshold').innerHTML=`<strong style="color:var(--accent-dark)">恭喜！</strong>你已达到最高职级 L6 董事局主席。`;
+  }
+  document.getElementById('levelCards').innerHTML=LEVELS.map((l,i)=>`
+    <div class="level-card-mini ${i<curIdx?'reached':''} ${i===curIdx?'current':''}">
+      <div class="lcm-lv">${l.lv}</div><div class="lcm-title">${l.title}</div>
+    </div>`).join('');
+
+  const totalProps=state.boards.reduce((s,bd)=>{const m=bd.members.find(x=>x.userId===state.currentUser.id);return s+(m?m.proposalsCount:0);},0);
+  document.getElementById('profileTotalProposals').textContent=totalProps;
+  document.getElementById('profileBoardsJoined').textContent=state.boards.length;
+  document.getElementById('profileBoardsCreated').textContent=state.boards.filter(bd=>bd.creatorId===state.currentUser.id).length;
+  document.getElementById('profileName').textContent=state.currentUser.name;
+}
+
+// ── 头像上传 ──
+function handleAvatarUpload(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size>5*1024*1024){toast('头像图片不能超过 5MB','info');return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    state.currentUser.avatar=ev.target.result;
+    ['profileAvatar','accountAvatar'].forEach(id=>{
+      const av=document.getElementById(id);
+      if(av){av.style.backgroundImage=`url(${ev.target.result})`;av.style.backgroundSize='cover';av.style.backgroundPosition='center';av.textContent='';}
+    });
+    updateNavAvatar();
+    toast('头像已更新','success');
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+function updateNavAvatar(){
+  document.querySelectorAll('.nav-avatar').forEach(el=>{
+    if(state.currentUser.avatar){
+      el.style.backgroundImage=`url(${state.currentUser.avatar})`;
+      el.style.backgroundSize='cover';
+      el.style.backgroundPosition='center';
+      el.textContent='';
+    }else{
+      el.style.backgroundImage='';
+      el.textContent=state.currentUser.name[0]||'U';
+    }
+  });
+}
+
+// ── 账户资料 ──
+function renderAccount(){
+  document.getElementById('acctName').value=state.currentUser.name;
+  document.getElementById('acctEmail').value=state.currentUser.email;
+  document.getElementById('acctPhone').value=state.currentUser.phone||'';
+  document.getElementById('acctOldPwd').value='';
+  document.getElementById('acctNewPwd').value='';
+  document.getElementById('acctConfirmPwd').value='';
+  document.getElementById('accountName').textContent=state.currentUser.name;
+  document.getElementById('acctJoinDate').value=todayStr();
+  const av=document.getElementById('accountAvatar');
+  if(av){
+    if(state.currentUser.avatar){av.style.backgroundImage=`url(${state.currentUser.avatar})`;av.style.backgroundSize='cover';av.style.backgroundPosition='center';av.textContent='';}
+    else{av.style.backgroundImage='';av.textContent=state.currentUser.name[0]||'U';}
+  }
+}
+function saveAccount(){
+  const name=document.getElementById('acctName').value.trim();
+  const email=document.getElementById('acctEmail').value.trim();
+  const phone=document.getElementById('acctPhone').value.trim();
+  if(!name){toast('昵称不能为空','info');return;}
+  if(!email||!email.includes('@')){toast('请输入有效的邮箱','info');return;}
+  state.currentUser.name=name; state.currentUser.email=email; state.currentUser.phone=phone;
+  const oldPwd=document.getElementById('acctOldPwd').value;
+  const newPwd=document.getElementById('acctNewPwd').value;
+  const confirmPwd=document.getElementById('acctConfirmPwd').value;
+  if(oldPwd||newPwd||confirmPwd){
+    if(oldPwd!==state.currentUser.password){toast('当前密码不正确','error');return;}
+    if(!newPwd||newPwd.length<6){toast('新密码至少 6 位','info');return;}
+    if(newPwd!==confirmPwd){toast('两次输入的新密码不一致','info');return;}
+    state.currentUser.password=newPwd;
+  }
+  state.boards.forEach(b=>{const m=b.members.find(x=>x.userId===state.currentUser.id);if(m)m.name=name;});
+  document.getElementById('accountName').textContent=name;
+  updateNavAvatar(); updateBoardContext();
+  toast('资料已保存，账号信息已同步更新','success');
+}
+function resetAccountForm(){ renderAccount(); toast('已重置为当前资料','info'); }
+
+// ── 我的职级 ──
+let levelViewBoardId=null;
+function renderMyLevel(){
+  if(!levelViewBoardId) levelViewBoardId=state.currentBoardId;
+  const b=state.boards.find(x=>x.id===levelViewBoardId);
+  if(!b) return;
+  const me=b.members.find(x=>x.userId===state.currentUser.id);
+  if(!me) return;
+  document.getElementById('levelBoardName').textContent=b.name;
+  document.getElementById('levelTitle').textContent=`${me.level} · ${LEVELS.find(l=>l.lv===me.level)?.title||''}`;
+  document.getElementById('levelProposals').textContent=me.proposalsCount;
+  document.getElementById('levelPassRate').textContent=me.passRate+'%';
+  document.getElementById('levelBoardSize').textContent=b.members.length;
+  const curIdx=LEVELS.findIndex(l=>l.lv===me.level);
+  if(curIdx<LEVELS.length-1){
+    const next=LEVELS[curIdx+1];
+    document.getElementById('levelProgressTitle').textContent=`晋升进度（目标：${next.lv} ${next.title}）`;
+    document.getElementById('levelProgressText').textContent=`${me.proposalsCount} / ${next.minCount} 次提案`;
+    const pct=Math.min(100,Math.round(me.proposalsCount/next.minCount*100));
+    document.getElementById('levelProgressFill').style.width=pct+'%';
+  }else{
+    document.getElementById('levelProgressTitle').textContent='已达最高职级';
+    document.getElementById('levelProgressText').textContent='董事局主席';
+    document.getElementById('levelProgressFill').style.width='100%';
+  }
+  document.getElementById('levelTableBody').innerHTML=LEVELS.map(l=>{
+    const reached=me.proposalsCount>=l.minCount&&me.passRate>=l.minRate;
+    const isCurrent=l.lv===me.level;
+    return `<tr style="border-bottom:1px solid var(--line-light)">
+      <td style="padding:12px 14px;font-weight:700">${l.lv}</td>
+      <td style="padding:12px 14px">${l.title}</td>
+      <td style="padding:12px 14px">≥ ${l.minCount} 次</td>
+      <td style="padding:12px 14px">≥ ${l.minRate}%</td>
+      <td style="padding:12px 14px">${isCurrent?'<span class="tag tag-gold" style="font-size:.72rem">当前职级</span>':reached?'<span class="tag tag-muted" style="font-size:.72rem">已达成</span>':'<span class="tag tag-muted" style="font-size:.72rem;opacity:.5">未解锁</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function showLevelBoardSwitcher(){
+  const options=state.boards.map(b=>{
+    const me=b.members.find(x=>x.userId===state.currentUser.id);
+    return `<div onclick="switchLevelView('${b.id}')" style="padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line-light)">
+      <span><strong>${b.name}</strong><br><span style="font-size:.75rem;color:var(--muted)">${me?me.level+' · '+(LEVELS.find(l=>l.lv===me.level)?.title||''):''}</span></span>
+      ${b.id===levelViewBoardId?'<span style="color:var(--accent-dark);font-size:.75rem">当前</span>':''}
+    </div>`;
+  }).join('');
+  showModal(`<h3>切换董事会视角</h3><div style="max-height:300px;overflow-y:auto;margin:12px -20px 0">${options}</div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button></div>`);
+}
+function switchLevelView(boardId){
+  levelViewBoardId=boardId;
+  closeModal();
+  renderMyLevel();
+  toast('已切换职级视角','success');
+}
+
+// ── 我的董事会页 ──
+let expandedBoardId=null;
+function renderMyBoards(){
+  document.getElementById('myBoardsPageList').innerHTML=state.boards.map(b=>{
+    const me=b.members.find(x=>x.userId===state.currentUser.id);
+    const levelName=me?LEVELS.find(l=>l.lv===me.level)?.name:'';
+    const isCurrent=b.id===state.currentBoardId;
+    const expanded=b.id===expandedBoardId;
+    const totalProps=b.proposals.length+b.history.length;
+    const membersHtml=b.members.map(m=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+        <div style="width:32px;height:32px;border-radius:50%;background:${m.avatar};color:#fff;display:grid;place-items:center;font-size:.75rem;font-weight:700">${m.name[0]}</div>
+        <div style="flex:1;min-width:0"><div style="font-size:.85rem;font-weight:600">${m.name} ${m.role==='创建者'?'<span style="font-size:.7rem;color:var(--accent-dark)">· 创建者</span>':''}</div><div style="font-size:.72rem;color:var(--muted)">${m.level} ${LEVELS.find(l=>l.lv===m.level)?.title||''}</div></div>
+      </div>`).join('');
+    return `<div class="card" style="padding:0;margin-bottom:14px;overflow:hidden">
+      <div onclick="switchToBoard('${b.id}')" style="padding:20px 24px;cursor:pointer;display:flex;align-items:center;gap:16px;${isCurrent?'background:rgba(184,147,90,.04)':''}">
+        <div style="width:44px;height:44px;border-radius:12px;background:${b.dotColor};display:grid;place-items:center;color:#fff;font-weight:800;font-size:1rem;flex-shrink:0">${b.name[0]}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:1rem">${b.name}</strong>${isCurrent?'<span class="tag tag-gold" style="font-size:.7rem">当前活跃</span>':''}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:2px">${b.members.length} 名成员 · ${totalProps} 份提案</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0"><span class="tag tag-muted" style="font-size:.75rem">${me?.level||''} ${levelName}</span></div>
+        <div onclick="event.stopPropagation();toggleBoardMembers('${b.id}')" style="cursor:pointer;padding:8px;color:var(--muted);transform:rotate(${expanded?'180deg':'0deg'});transition:transform .2s;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg>
+        </div>
+      </div>
+      ${expanded?`<div style="padding:0 24px 20px;border-top:1px solid var(--line-light);background:var(--canvas)">
+        <div style="font-size:.8rem;font-weight:700;color:var(--muted);margin:14px 0 6px">董事会成员（${b.members.length}）</div>
+        <div style="display:grid;grid-template-columns:1fr;gap:0 24px">${membersHtml}</div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function toggleBoardMembers(boardId){
+  expandedBoardId=expandedBoardId===boardId?null:boardId;
+  renderMyBoards();
+}
+function switchToBoard(boardId){
+  state.currentBoardId=boardId;
+  levelViewBoardId=boardId;
+  updateBoardContext();
+  go('board-home');
+  toast(`已切换到「${state.boards.find(b=>b.id===boardId)?.name}」`,'success');
+}
+function showJoinBoardModal(){
+  showModal(`<h3>加入董事会</h3><p class="modal-sub">输入邀请码加入已有的董事会</p><input class="input-field" id="joinCodeInput" placeholder="例如：PALM-0000" style="margin:12px 0"><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="doJoinBoard()">确认加入</button></div>`);
+}
+function doJoinBoard(){
+  const code=document.getElementById('joinCodeInput').value.trim().toUpperCase();
+  if(!code){toast('请输入邀请码','info');return;}
+  const b=state.boards.find(x=>x.inviteCode===code);
+  if(b){
+    if(b.members.find(m=>m.userId===state.currentUser.id)){toast('你已在该董事会中','info');return;}
+    b.members.push({userId:state.currentUser.id,name:state.currentUser.name,avatar:AV[0],role:'成员',level:'L1',proposalsCount:0,passRate:0,joined:todayStr()});
+    closeModal();
+    toast(`已成功加入「${b.name}」`,'success');
+    renderMyBoards();
+  }else{
+    toast('邀请码无效，请检查后重试','error');
+  }
+}
+
+// ── 通知 ──
+function toggleNotifs(){
+  const panel=document.getElementById('notifPanel');
+  panel.classList.toggle('active');
+  if(panel.classList.contains('active')) renderNotifs();
+}
+const notifIcons={
+  vote:'<svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L120,140.69l42.34-42.35a8,8,0,0,1,11.32,11.32Z"/></svg>',
+  deadline:'<svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>',
+  member:'<svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM56,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,56,108Zm156.61,66.08a8,8,0,0,1-11.16-2.17,79.82,79.82,0,0,0-33.54-26.27,8,8,0,0,1,8.18-13.94,95.71,95.71,0,0,1,40.15,31.45A8,8,0,0,1,212.61,174.08ZM188,96a36,36,0,1,0-36-36A36,36,0,0,0,188,96Zm0-56a20,20,0,1,1-20,20A20,20,0,0,1,188,40Z"/></svg>',
+  level:'<svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M232,64H208V48a8,8,0,0,0-8-8H56a8,8,0,0,0-8,8V64H24A16,16,0,0,0,8,80V96a40,40,0,0,0,40,40h3.65A80.13,80.13,0,0,0,120,191.61V216H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V191.58c31.94-3.23,58.44-25.64,68.08-55.58H208a40,40,0,0,0,40-40V80A16,16,0,0,0,232,64Z"/></svg>',
+  result:'<svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>',
+};
+const notifColors={vote:'var(--accent-dark)',deadline:'#C47A3A',member:'#5A7A8A',level:'var(--accent)',result:'var(--success)'};
+function renderNotifs(){
+  const list=document.getElementById('notifList');
+  if(!list) return;
+  if(state.notifications.length===0){
+    list.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:.85rem">暂无通知</div>';
+  }else{
+    list.innerHTML=state.notifications.map(n=>`
+      <div class="notif-item ${n.unread?'unread':''}" onclick="showNotifDetail(${n.id})">
+        <span class="ni-dot" style="background:${notifColors[n.type]||'var(--accent)'}">${notifIcons[n.type]||notifIcons.vote}</span>
+        <div class="ni-content"><div class="ni-title">${n.title}</div><div class="ni-time">${n.time}</div></div>
+      </div>`).join('');
+  }
+  const unread=state.notifications.filter(n=>n.unread).length;
+  const dot=document.getElementById('notifDot');
+  if(dot) dot.style.display=unread>0?'block':'none';
+}
+function showNotifDetail(id){
+  const n=state.notifications.find(x=>x.id===id);
+  if(!n) return;
+  n.unread=false;
+  renderNotifs();
+  document.getElementById('notifPanel').classList.remove('active');
+  showModal(`<h3>通知详情</h3><p style="font-size:.92rem;line-height:1.7;color:var(--ink);margin:12px 0">${n.detail||n.title}</p><p style="font-size:.78rem;color:var(--muted)">${n.time}</p><div class="modal-actions"><button class="btn btn-gold" onclick="closeModal()">知道了</button></div>`);
+}
+function clearNotifs(){ state.notifications.forEach(n=>n.unread=false); renderNotifs(); toast('所有通知已标记为已读','success'); }
+document.addEventListener('click',function(e){
+  const panel=document.getElementById('notifPanel');
+  if(panel && !e.target.closest('.notif-panel')&&!e.target.closest('.nav-icon-btn')) panel.classList.remove('active');
+});
+
+// ── 弹窗 ──
+function showModal(html){ document.getElementById('modalContent').innerHTML=html; document.getElementById('modalOverlay').classList.add('active'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
+document.getElementById('modalOverlay').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
+// ── Toast ──
+function toast(msg,type='info'){
+  const container=document.getElementById('toastContainer');
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  const icon=type==='success'?'✓':type==='error'||type==='danger'?'✗':'ℹ';
+  el.innerHTML=`<span>${icon}</span><span>${msg}</span>`;
+  container.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(20px)';el.style.transition='all .3s';setTimeout(()=>el.remove(),300);},3000);
+}
+
+// ── 移动端表单栅格适配 ──
+function setupResponsiveGrids(){
+  const mq=window.matchMedia('(max-width:900px)');
+  function apply(){
+    document.querySelectorAll('.account-form-grid,.pwd-form-grid').forEach(g=>{
+      g.style.gridTemplateColumns=mq.matches?'1fr':'';
+    });
+  }
+  apply();
+  mq.addEventListener('change',apply);
+}
+
+// ── 初始化 ──
+renderNotifs();
+setupResponsiveGrids();
+</script>
 </body>
 </html>
