@@ -12,6 +12,14 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231E2630'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%23B8935A' stroke-width='2.5'/%3E%3Crect x='14.5' y='7' width='3' height='8' rx='1' fill='%23B8935A' transform='rotate(-35 16 16)'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://miaoda.feishu.cn" crossorigin>
 <link href="https://miaoda.feishu.cn/fonts/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<!-- Supabase JS SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+// 如果第一个CDN加载失败，自动加载备用CDN
+if (typeof window.supabase === 'undefined') {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');
+}
+</script>
 <style>
 :root{
   --canvas:#F4F1EA; --canvas-2:#EDE9E0; --canvas-3:#E6E1D6;
@@ -1163,6 +1171,16 @@ const LEVELS = [
 
 const AV = ['#1E2630','#B8935A','#5A7A8A','#7A5A6A','#6A8A6A','#8A6A5A','#5A6A8A','#7A8A5A','#8A5A7A','#6A7A5A'];
 
+// ── ★ Supabase 配置：替换为你的项目信息 ★ ──
+const SUPABASE_URL = 'https://qaxkmtdiftirdobtiwag.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InEheGttdGZpZHRpcmRvYmd0aSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzIwMDAwMDAwLCJleHAiOjE5Mzc3NjAwMDB9.placeholder-replace-with-your-real-key';
+// ────────────────────────────────────────────
+
+let supabase = null;
+if (typeof window.supabase !== 'undefined') {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
 function makeVoters(names, avatars, votes) {
   return names.map((n,i)=>({name:n, avatar:avatars[i%avatars.length], vote:votes[i]||'pending', reason:'', reasonImages:[]}));
 }
@@ -1273,9 +1291,9 @@ function updateBoardContext(){
   if(msub) msub.textContent=`${b.members.length} / 50 名成员 · 创建者可移除成员`;
 }
 
-// ── 认证：简化登录注册流程（无需邮箱验证码） ──
-// 登录：直接邮箱+密码一步登录
-function doLogin(){
+// ── 认证：简化登录注册流程（接入 Supabase Auth） ──
+// 登录：邮箱+密码，调用 Supabase Auth
+async function doLogin(){
   const email=document.getElementById('loginEmail').value.trim().toLowerCase();
   const pwd=document.getElementById('loginPwd').value;
   const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1284,30 +1302,27 @@ function doLogin(){
   if(!emailRegex.test(email)){toast('邮箱格式不正确，请检查','error');return;}
   if(!pwd){toast('请输入密码','info');return;}
 
-  // 检查邮箱是否已注册
-  if(!state.registeredEmails.includes(email)){
-    showModal(`
-      <h3>该邮箱尚未注册</h3>
-      <p class="modal-sub">邮箱 <strong style="color:var(--accent-dark)">${email}</strong> 还没有注册过掌上董事会账号。你可以立即注册，开始创建你的专属董事会。</p>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="closeModal()">再想想</button>
-        <button class="btn btn-gold" onclick="closeModal();go('register')">前往注册</button>
-      </div>
-    `);
+  if(!supabase){toast('系统加载中，请稍后再试','error');return;}
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+  if (error) {
+    toast(error.message === 'Invalid login credentials' ? '邮箱或密码错误' : error.message, 'error');
     return;
   }
 
-  state.currentUser.email=email;
-  state.currentUser.password=pwd;
-  toast('登录成功，欢迎回来','success');
+  // 加载用户资料和董事会数据
+  await loadUserProfile(data.user.id);
+  await loadUserBoards();
+
+  toast('登录成功，欢迎回来', 'success');
   setTimeout(()=>{
     if(state.boards.length===0){ go('onboarding'); }
     else { go('board-home'); }
-  },600);
+  }, 600);
 }
 
-// 注册：昵称+邮箱+密码，仅验证邮箱格式
-function doRegister(){
+// 注册：昵称+邮箱+密码，调用 Supabase Auth
+async function doRegister(){
   const name=document.getElementById('regName').value.trim();
   const email=document.getElementById('regEmail').value.trim().toLowerCase();
   const pwd=document.getElementById('regPwd').value;
@@ -1318,24 +1333,185 @@ function doRegister(){
   if(!emailRegex.test(email)){toast('邮箱格式不正确，请检查','error');return;}
   if(!pwd||pwd.length<6){toast('密码至少 6 位','info');return;}
 
-  // 检查是否已注册
-  if(state.registeredEmails.includes(email)){
-    showModal(`<h3>该邮箱已注册</h3><p class="modal-sub">邮箱 <strong style="color:var(--accent-dark)">${email}</strong> 已经注册过账号，可直接登录。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">再想想</button><button class="btn btn-gold" onclick="closeModal();go('login')">去登录</button></div>`);
+  if(!supabase){toast('系统加载中，请稍后再试','error');return;}
+
+  const { data, error } = await supabase.auth.signUp({
+    email, password: pwd,
+    options: { data: { name } }
+  });
+
+  if (error) {
+    toast(error.message, 'error');
     return;
   }
 
-  state.currentUser.name=name;
-  state.currentUser.email=email;
-  state.currentUser.password=pwd;
-  state.registeredEmails.push(email);
-
-  if(state.pendingInvite){
-    toast('注册成功！正在加入受邀董事会...','success');
-    setTimeout(()=>{completeInviteRegister();go('board-home');},800);
-  }else{
-    toast('注册成功！请创建你的第一个董事会','success');
-    setTimeout(()=>go('onboarding'),600);
+  // 注册成功，自动登录（因为我们关了邮箱验证）
+  if (data.session) {
+    await loadUserProfile(data.user.id);
+    // 处理待处理的邀请
+    await processPendingInvite();
+    if (!state.pendingInvite) {
+      toast('注册成功！请创建你的第一个董事会', 'success');
+      setTimeout(()=>go('onboarding'), 800);
+    }
+  } else {
+    toast('注册成功！请验证邮箱后登录', 'success');
+    setTimeout(()=>go('login'), 1500);
   }
+}
+
+// 加载用户资料
+async function loadUserProfile(userId){
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  if (data) {
+    state.currentUser = {
+      id: userId,
+      name: data.name || '用户',
+      email: state.currentUser.email || '',
+      avatar_url: data.avatar_url,
+      phone: data.phone,
+      password: ''
+    };
+  }
+  // 更新邮箱
+  const { data: authData } = await supabase.auth.getUser();
+  if (authData?.user?.email) state.currentUser.email = authData.user.email;
+}
+
+// 加载用户加入的所有董事会
+async function loadUserBoards(){
+  const { data, error } = await supabase
+    .from('board_members')
+    .select('board_id, boards(*), profiles(name, avatar_url)')
+    .eq('user_id', state.currentUser.id);
+  if (error) { console.error(error); return; }
+
+  state.boards = await Promise.all(data.map(async (m) => {
+    const b = m.boards;
+    // 加载该董事会的成员
+    const { data: members } = await supabase
+      .from('board_members')
+      .select('*, profiles(name, avatar_url)')
+      .eq('board_id', b.id);
+    // 加载投票中的提案
+    const { data: props } = await supabase
+      .from('proposals')
+      .select('*, proposal_images(public_url)')
+      .eq('board_id', b.id)
+      .eq('status', 'voting')
+      .order('created_at', { ascending: false });
+    // 加载历史提案
+    const { data: hist } = await supabase
+      .from('proposals')
+      .select('*, proposal_images(public_url)')
+      .eq('board_id', b.id)
+      .in('status', ['passed', 'rejected', 'withdrawn'])
+      .order('deadline_at', { ascending: false });
+    // 加载投票数据
+    const { data: votes } = await supabase
+      .from('votes')
+      .select('*, profiles(name, avatar_url)')
+      .in('proposal_id', [...(props||[]).map(p=>p.id), ...(hist||[]).map(p=>p.id)]);
+
+    return {
+      id: b.id,
+      name: b.name,
+      desc: b.description || '',
+      creatorId: b.creator_id,
+      inviteCode: b.invite_code,
+      dotColor: b.dot_color || '#B8935A',
+      members: members?.map(mem => ({
+        userId: mem.user_id,
+        name: mem.profiles?.name || '用户',
+        avatar: mem.profiles?.avatar_url || AV[mem.user_id.charCodeAt(0) % AV.length],
+        role: mem.role,
+        level: mem.level,
+        proposalsCount: mem.proposals_count || 0,
+        passRate: mem.pass_rate || 0,
+        joined: mem.joined_at?.slice(0, 10) || '—',
+      })) || [],
+      proposals: props?.map(p => formatProposalFromDB(p, votes?.filter(v=>v.proposal_id===p.id)||[])) || [],
+      history: hist?.map(p => formatProposalFromDB(p, votes?.filter(v=>v.proposal_id===p.id)||[])) || [],
+    };
+  }));
+
+  if (state.boards.length > 0) {
+    state.currentBoardId = state.boards[0].id;
+  }
+}
+
+// 把数据库提案格式转成前端格式
+function formatProposalFromDB(p, votes) {
+  const yesVotes = votes.filter(v => v.vote === 'yes');
+  const noVotes = votes.filter(v => v.vote === 'no');
+  return {
+    id: p.id,
+    type: p.type,
+    title: p.title,
+    amount: p.amount || '—',
+    deadline: p.deadline_at?.slice(0, 10) || '',
+    desc: p.description || '',
+    status: p.status,
+    yes: yesVotes.length,
+    no: noVotes.length,
+    images: p.proposal_images?.map(i => i.public_url) || [],
+    creatorId: p.creator_id,
+    voters: votes.map(v => ({
+      name: v.profiles?.name || '用户',
+      avatar: v.profiles?.avatar_url || AV[v.user_id.charCodeAt(0) % AV.length],
+      vote: v.vote,
+      reason: v.reason || '',
+      reasonImages: [],
+      userId: v.user_id,
+    })),
+  };
+}
+
+// 处理邀请码
+async function processPendingInvite(){
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('invite');
+  if (code) {
+    state.pendingInvite = { inviteCode: code.toUpperCase() };
+    // 自动加入
+    await joinBoardByCode(code.toUpperCase());
+  }
+}
+
+// 通过邀请码加入董事会
+async function joinBoardByCode(code) {
+  const { data: board, error } = await supabase
+    .from('boards')
+    .select('*')
+    .eq('invite_code', code)
+    .single();
+  if (error || !board) { toast('邀请码无效', 'error'); return false; }
+
+  // 检查是否已加入
+  const { data: existing } = await supabase
+    .from('board_members')
+    .select('*')
+    .eq('board_id', board.id)
+    .eq('user_id', state.currentUser.id);
+  if (existing && existing.length > 0) {
+    state.currentBoardId = board.id;
+    return true;
+  }
+
+  // 加入
+  const { error: joinError } = await supabase
+    .from('board_members')
+    .insert({ board_id: board.id, user_id: state.currentUser.id, role: '成员', level: 'L1' });
+  if (joinError) { toast(joinError.message, 'error'); return false; }
+
+  state.currentBoardId = board.id;
+  await loadUserBoards();
+  toast(`已成功加入「${board.name}」`, 'success');
+  return true;
 }
 
 function verifyForgotEmail(){
@@ -1361,26 +1537,39 @@ function resetPassword(){
   setTimeout(()=>go('login'),800);
 }
 
-function createBoardFromOnboarding(){
+async function createBoardFromOnboarding(){
   const name=document.getElementById('boardName').value.trim();
   const desc=document.getElementById('boardDesc').value.trim();
   if(!name){toast('请输入董事会名称','info');return;}
-  const newId='b'+Date.now();
-  state.boards.push({
-    id:newId, name, desc:desc||'', creatorId:state.currentUser.id,
-    inviteCode:'PALM-'+Math.random().toString(36).substr(2,4).toUpperCase(),
-    dotColor:'#'+Math.floor(Math.random()*0x888888+0x444444).toString(16),
-    members:[{userId:state.currentUser.id, name:state.currentUser.name, avatar:AV[0], role:'创建者', level:'L1', proposalsCount:0, passRate:0, joined:todayStr()}],
-    proposals:[], history:[],
-  });
-  state.currentBoardId=newId;
+
+  const inviteCode='PALM-'+Math.random().toString(36).substr(2,4).toUpperCase();
+  const dotColor='#'+Math.floor(Math.random()*0x888888+0x444444).toString(16);
+
+  const { data, error } = await supabase
+    .from('boards')
+    .insert({ name, description: desc, creator_id: state.currentUser.id, invite_code: inviteCode, dot_color: dotColor })
+    .select()
+    .single();
+  if (error) { toast(error.message, 'error'); return; }
+
+  // 重新加载董事会列表
+  await loadUserBoards();
+  state.currentBoardId = data.id;
+
   toast('董事会创建成功！','success');
   document.getElementById('boardName').value='';
   document.getElementById('boardDesc').value='';
   setTimeout(()=>go('board-home'),600);
 }
 
-function doLogout(){ toast('已退出登录','info'); go('login'); }
+async function doLogout(){
+  if (supabase) await supabase.auth.signOut();
+  state.currentUser = { id: '', name: '用户', email: '', phone: '', avatar: null, password: '' };
+  state.boards = [];
+  state.currentBoardId = null;
+  toast('已退出登录','info');
+  go('login');
+}
 
 // ── 董事会切换 ──
 function showBoardSwitcher(){
@@ -1615,24 +1804,33 @@ function castVote(id,vote,isChange){
   showModal(`<h3>${title}</h3><p class="modal-sub">填写理由可以帮助发起人理解你的想法，也可以直接提交不填理由。</p><textarea class="input-field" id="voteReason" placeholder="${placeholder}" style="min-height:80px"></textarea><div style="margin-top:14px"><div class="img-upload-zone" onclick="document.getElementById('voteImageInput').click()" style="padding:14px"><svg width="22" height="22" viewBox="0 0 256 256" fill="currentColor"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM160,96a8,8,0,0,1,8-8h32a8,8,0,0,1,0,16H168A8,8,0,0,1,160,96Zm-32,16a32,32,0,1,0,32,32A32,32,0,0,0,128,112Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,128,160Z"/></svg><div class="uz-text" style="font-size:.8rem">添加理由配图（最多3张）</div></div><input type="file" id="voteImageInput" accept="image/jpeg,image/png,image/gif" multiple style="display:none" onchange="handleVoteImages(event)"><div class="img-preview-grid" id="voteImagePreview" style="grid-template-columns:repeat(3,1fr)"></div></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-ghost" onclick="confirmVote(${id},'${vote}')">直接提交</button><button class="btn ${btnClass}" onclick="confirmVote(${id},'${vote}')">${btnText}</button></div>`);
 }
 
-function confirmVote(id,vote){
-  const p=currentBoard().proposals.find(x=>x.id===id);
-  if(!p) return;
+async function confirmVote(id,vote){
   const reason=document.getElementById('voteReason')?.value||'';
   const reasonImages=[...state.voteReasonImages];
   const oldVote=state.userVotes[id];
-  if(oldVote){
-    if(oldVote==='yes') p.yes=Math.max(0,p.yes-1);
-    else p.no=Math.max(0,p.no-1);
-  }
-  if(vote==='yes') p.yes++; else p.no++;
-  const voter=p.voters.find(v=>v.name===state.currentUser.name);
-  if(voter){voter.vote=vote;voter.reason=reason;voter.reasonImages=reasonImages;}
+
+  // upsert 投票到数据库
+  const { error } = await supabase
+    .from('votes')
+    .upsert({
+      proposal_id: id,
+      user_id: state.currentUser.id,
+      vote: vote,
+      reason: reason
+    }, { onConflict: 'proposal_id,user_id' });
+
+  if (error) { toast(error.message, 'error'); return; }
+
   state.userVotes[id]=vote;
   state.voteReasonImages=[];
   closeModal();
-  toast(oldVote?`已修改为「${vote==='yes'?'通过':'反对'}」票`:`已投「${vote==='yes'?'通过':'反对'}」票`,'success');
-  renderProposalDetail(p,'voting');
+  toast(oldVote ? `已修改为「${vote==='yes'?'通过':'反对'}」票` : `已投「${vote==='yes'?'通过':'反对'}」票`, 'success');
+
+  // 重新加载提案数据
+  await loadUserBoards();
+  const p = currentBoard().proposals.find(x=>x.id===id);
+  if (p) renderProposalDetail(p, 'voting');
+  updateBoardContext();
 }
 
 function repropose(id){
@@ -1642,9 +1840,19 @@ function repropose(id){
 }
 
 function withdrawProposal(id){
-  showModal(`<h3>确认撤回提案？</h3><p class="modal-sub">撤回后提案将移入归档，当前投票记录将保留。你可以随时重新发起。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">再想想</button><button class="btn btn-danger" onclick="confirmWithdraw()">确认撤回</button></div>`);
+  showModal(`<h3>确认撤回提案？</h3><p class="modal-sub">撤回后提案将移入归档，当前投票记录将保留。你可以随时重新发起。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">再想想</button><button class="btn btn-danger" onclick="confirmWithdraw('${id}')">确认撤回</button></div>`);
 }
-function confirmWithdraw(){ closeModal(); toast('提案已撤回','success'); setTimeout(()=>go('board-home'),500); }
+async function confirmWithdraw(id){
+  const { error } = await supabase
+    .from('proposals')
+    .update({ status: 'withdrawn' })
+    .eq('id', id);
+  if (error) { toast(error.message, 'error'); return; }
+  closeModal();
+  toast('提案已撤回','success');
+  await loadUserBoards();
+  setTimeout(()=>go('board-home'),500);
+}
 
 // ── 图片上传 ──
 function handlePropImages(e){
@@ -1698,29 +1906,50 @@ function selectType(el,type){ document.querySelectorAll('.type-option').forEach(
 function selectDeadline(el,val){ document.querySelectorAll('.deadline-opt').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); state.selectedDeadline=val; }
 document.addEventListener('input',function(e){ if(e.target.id==='propTitle') document.getElementById('titleCount').textContent=e.target.value.length+'/50'; });
 
-function submitProposal(){
+async function submitProposal(){
   const title=document.getElementById('propTitle').value.trim();
   if(!title){toast('请填写提案标题','info');return;}
   const b=currentBoard();
   const amount=document.getElementById('propAmount').value;
   const desc=document.getElementById('propDesc').value;
-  const newProp={
-    id:Date.now(), type:state.selectedType, title,
-    amount:amount?('¥'+amount):(state.selectedType==='travel'?'待定':'—'),
-    deadline:state.selectedDeadline, desc, status:'voting', yes:0, no:0,
-    images:[...state.proposalImages],
-    voters:b.members.map(m=>({name:m.name,avatar:m.avatar,vote:'pending',reason:'',reasonImages:[]})),
-  };
-  b.proposals.unshift(newProp);
-  toast(`提案发布成功！已通知 ${b.members.length} 名董事`,'success');
+  const hoursMap = { '1h': 1, '6h': 6, '24h': 24, '48h': 48 };
+  const hours = hoursMap[state.selectedDeadline] || 24;
+  const deadlineAt = new Date(Date.now() + hours * 3600000).toISOString();
+
+  // 插入提案到数据库
+  const { data: prop, error } = await supabase
+    .from('proposals')
+    .insert({
+      board_id: state.currentBoardId,
+      creator_id: state.currentUser.id,
+      type: state.selectedType,
+      title,
+      amount: amount ? ('¥' + amount) : (state.selectedType === 'travel' ? '待定' : '—'),
+      description: desc,
+      deadline_hours: hours,
+      deadline_at: deadlineAt,
+      status: 'voting'
+    })
+    .select()
+    .single();
+  if (error) { toast(error.message, 'error'); return; }
+
+  // 上传提案配图（先简化，只存base64临时预览，后续可接Storage）
+  // 这里先跳过图片上传，后续再完善
+
+  toast(`提案发布成功！`, 'success');
+
   document.getElementById('propTitle').value='';
   document.getElementById('propAmount').value='';
   document.getElementById('propDesc').value='';
   document.getElementById('titleCount').textContent='0/50';
   state.proposalImages=[];
   renderPropImagePreview();
+
+  // 重新加载提案数据
+  await loadUserBoards();
   updateBoardContext();
-  setTimeout(()=>openProposal(newProp.id),600);
+  setTimeout(()=>openProposal(prop.id),600);
 }
 
 // ── 成员管理 ──
@@ -1746,10 +1975,18 @@ function removeMember(userId){
   const m=b.members.find(x=>x.userId===userId);
   showModal(`<h3>移除成员</h3><p class="modal-sub">确定要将 <strong>${m.name}</strong> 移出「${b.name}」吗？移除后该成员将失去访问权。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-danger" onclick="confirmRemove('${userId}')">确认移除</button></div>`);
 }
-function confirmRemove(userId){
-  const b=currentBoard();
-  b.members=b.members.filter(m=>m.userId!==userId);
-  closeModal(); toast('成员已移除','success'); renderMembers(); updateBoardContext();
+async function confirmRemove(userId){
+  const { error } = await supabase
+    .from('board_members')
+    .delete()
+    .eq('board_id', state.currentBoardId)
+    .eq('user_id', userId);
+  if (error) { toast(error.message, 'error'); return; }
+  closeModal();
+  toast('成员已移除', 'success');
+  await loadUserBoards();
+  renderMembers();
+  updateBoardContext();
 }
 
 // ── 邀请 ──
@@ -1757,7 +1994,7 @@ function renderInvite(){
   const b=currentBoard();
   if(!b) return;
   document.getElementById('inviteCodeDisplay').textContent=b.inviteCode;
-  document.getElementById('inviteLinkInput').value=location.origin+'/join/'+b.inviteCode;
+  document.getElementById('inviteLinkInput').value=location.origin+'?invite='+b.inviteCode;
 }
 function copyLink(){
   const input=document.getElementById('inviteLinkInput');
@@ -1769,9 +2006,15 @@ function copyLink(){
 function resetInvite(){
   showModal(`<h3>重置邀请链接？</h3><p class="modal-sub">重置后当前邀请链接和邀请码将立即失效，需要重新生成并分享。已加入的成员不受影响。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-danger" onclick="doResetInvite()">确认重置</button></div>`);
 }
-function doResetInvite(){
+async function doResetInvite(){
   const b=currentBoard();
-  b.inviteCode='PALM-'+Math.random().toString(36).substr(2,4).toUpperCase();
+  const newCode='PALM-'+Math.random().toString(36).substr(2,4).toUpperCase();
+  const { error } = await supabase
+    .from('boards')
+    .update({ invite_code: newCode })
+    .eq('id', b.id);
+  if (error) { toast(error.message, 'error'); return; }
+  b.inviteCode = newCode;
   closeModal(); renderInvite(); toast('邀请链接已重置','success');
 }
 
@@ -1880,23 +2123,32 @@ function renderAccount(){
     else{av.style.backgroundImage='';av.textContent=state.currentUser.name[0]||'U';}
   }
 }
-function saveAccount(){
+async function saveAccount(){
   const name=document.getElementById('acctName').value.trim();
-  const email=document.getElementById('acctEmail').value.trim();
   const phone=document.getElementById('acctPhone').value.trim();
   if(!name){toast('昵称不能为空','info');return;}
-  if(!email||!email.includes('@')){toast('请输入有效的邮箱','info');return;}
-  state.currentUser.name=name; state.currentUser.email=email; state.currentUser.phone=phone;
+
+  // 更新 profile 表
+  const { error } = await supabase
+    .from('profiles')
+    .update({ name, phone })
+    .eq('id', state.currentUser.id);
+  if (error) { toast(error.message, 'error'); return; }
+
+  state.currentUser.name=name;
+  state.currentUser.phone=phone;
+
+  // 密码修改
   const oldPwd=document.getElementById('acctOldPwd').value;
   const newPwd=document.getElementById('acctNewPwd').value;
   const confirmPwd=document.getElementById('acctConfirmPwd').value;
   if(oldPwd||newPwd||confirmPwd){
-    if(oldPwd!==state.currentUser.password){toast('当前密码不正确','error');return;}
     if(!newPwd||newPwd.length<6){toast('新密码至少 6 位','info');return;}
     if(newPwd!==confirmPwd){toast('两次输入的新密码不一致','info');return;}
-    state.currentUser.password=newPwd;
+    const { error: pwdError } = await supabase.auth.updateUser({ password: newPwd });
+    if (pwdError) { toast(pwdError.message, 'error'); return; }
   }
-  state.boards.forEach(b=>{const m=b.members.find(x=>x.userId===state.currentUser.id);if(m)m.name=name;});
+
   document.getElementById('accountName').textContent=name;
   updateNavAvatar(); updateBoardContext();
   toast('资料已保存，账号信息已同步更新','success');
@@ -2005,17 +2257,15 @@ function switchToBoard(boardId){
 function showJoinBoardModal(){
   showModal(`<h3>加入董事会</h3><p class="modal-sub">输入邀请码加入已有的董事会</p><input class="input-field" id="joinCodeInput" placeholder="例如：PALM-0000" style="margin:12px 0"><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="doJoinBoard()">确认加入</button></div>`);
 }
-function doJoinBoard(){
+async function doJoinBoard(){
   const code=document.getElementById('joinCodeInput').value.trim().toUpperCase();
   if(!code){toast('请输入邀请码','info');return;}
-  const b=state.boards.find(x=>x.inviteCode===code);
-  if(b){
-    if(b.members.find(m=>m.userId===state.currentUser.id)){toast('你已在该董事会中','info');return;}
-    b.members.push({userId:state.currentUser.id,name:state.currentUser.name,avatar:AV[0],role:'成员',level:'L1',proposalsCount:0,passRate:0,joined:todayStr()});
+  const success = await joinBoardByCode(code);
+  if (success) {
     closeModal();
-    toast(`已成功加入「${b.name}」`,'success');
-    renderMyBoards();
-  }else{
+    await loadUserBoards();
+    go('board-home');
+  } else {
     toast('邀请码无效，请检查后重试','error');
   }
 }
@@ -2095,6 +2345,39 @@ function setupResponsiveGrids(){
 // ── 初始化 ──
 renderNotifs();
 setupResponsiveGrids();
+
+// 检查登录状态
+(async function initAuth() {
+  if (!supabase) {
+    document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif"><h2>系统加载失败</h2><p>请检查网络后刷新页面重试</p></div>';
+    return;
+  }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    await loadUserProfile(session.user.id);
+    await loadUserBoards();
+    await processPendingInvite();
+    if (state.boards.length > 0) {
+      go('board-home');
+    } else {
+      go('onboarding');
+    }
+  } else {
+    // 检查URL是否有邀请码
+    await processPendingInvite();
+    go('login');
+  }
+
+  // 监听登出
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') {
+      state.currentUser = { id: '', name: '用户', email: '', phone: '', avatar: null, password: '' };
+      state.boards = [];
+      state.currentBoardId = null;
+      go('login');
+    }
+  });
+})();
 </script>
 </body>
 </html>
