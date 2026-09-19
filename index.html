@@ -596,15 +596,18 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
       <div class="auth-form">
         <div class="af-logo"><span class="mark"></span><span>掌上董事会</span></div>
         <h1>欢迎回来</h1>
-        <p class="af-sub">输入你的邮箱，验证身份后继续</p>
+        <p class="af-sub">输入邮箱和密码，开始你的董事生涯</p>
         <div class="form-body">
           <div class="input-group">
             <label>邮箱 <span class="req">*</span></label>
-            <input class="input-field" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')verifyLoginEmail()">
-            <span class="hint">我们将发送验证邮件到你的邮箱</span>
+            <input class="input-field" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()">
           </div>
-          <div id="loginEmailError" style="display:none;padding:10px 14px;background:rgba(160,74,58,.08);border:1px solid rgba(160,74,58,.2);border-radius:var(--r-control);font-size:.82rem;color:var(--danger);line-height:1.5"></div>
-          <button class="btn btn-gold btn-block" onclick="verifyLoginEmail()">下一步</button>
+          <div class="input-group">
+            <label>密码 <span class="req">*</span></label>
+            <input class="input-field" type="password" id="loginPwd" placeholder="输入密码" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+          </div>
+          <div style="text-align:right;margin-bottom:16px"><a onclick="go('forgot')" style="font-size:.85rem;color:var(--accent-dark);cursor:pointer">忘记密码？</a></div>
+          <button class="btn btn-gold btn-block" onclick="doLogin()">登 录</button>
         </div>
         <p class="af-footer">还没有账号？<a onclick="go('register')">立即注册</a></p>
       </div>
@@ -697,14 +700,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.6}
           <div class="input-group">
             <label>邮箱 <span class="req">*</span></label>
             <input class="input-field" type="email" id="regEmail" placeholder="your@email.com" autocomplete="email">
-          </div>
-          <div class="input-group">
-            <label>邮箱验证码 <span class="req">*</span></label>
-            <div style="display:flex;gap:8px">
-              <input class="input-field" id="regEmailCode" placeholder="6位验证码" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="flex:1;min-width:0;font-family:'Space Grotesk',monospace;letter-spacing:.1em">
-              <button class="btn btn-outline-gold" id="sendCodeBtn" onclick="sendRegisterCode()" style="flex-shrink:0;white-space:nowrap">发送验证码</button>
-            </div>
-            <span class="hint" id="codeHint">先输入邮箱，再点击"发送验证码"</span>
+            <span class="hint">用于登录和找回密码，请填写正确的邮箱地址</span>
           </div>
           <div class="input-group"><label>密码 <span class="req">*</span></label><input class="input-field" type="password" id="regPwd" placeholder="至少 6 位" autocomplete="new-password"></div>
           <button class="btn btn-gold btn-block" onclick="doRegister()">注 册 并 创建董事会</button>
@@ -1277,38 +1273,22 @@ function updateBoardContext(){
   if(msub) msub.textContent=`${b.members.length} / 50 名成员 · 创建者可移除成员`;
 }
 
-// ── 认证：邮箱验证三步流程 ──
-// 第一步：输入邮箱，检查是否已注册
-function verifyLoginEmail(){
+// ── 认证：简化登录注册流程（无需邮箱验证码） ──
+// 登录：直接邮箱+密码一步登录
+function doLogin(){
   const email=document.getElementById('loginEmail').value.trim().toLowerCase();
-  const errBox=document.getElementById('loginEmailError');
-  errBox.style.display='none';
-
-  // 1. 邮箱格式验证
+  const pwd=document.getElementById('loginPwd').value;
   const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if(!email){
-    errBox.textContent='请输入邮箱地址';
-    errBox.style.display='block';
-    return;
-  }
-  if(!emailRegex.test(email)){
-    errBox.textContent='邮箱格式不正确，请检查后重新输入';
-    errBox.style.display='block';
-    return;
-  }
 
-  // 2. 检查邮箱是否已注册
-  const isRegistered=state.registeredEmails.includes(email);
-  if(!isRegistered){
-    // 未注册：显示引导注册的提示
+  if(!email){toast('请输入邮箱地址','info');return;}
+  if(!emailRegex.test(email)){toast('邮箱格式不正确，请检查','error');return;}
+  if(!pwd){toast('请输入密码','info');return;}
+
+  // 检查邮箱是否已注册
+  if(!state.registeredEmails.includes(email)){
     showModal(`
       <h3>该邮箱尚未注册</h3>
       <p class="modal-sub">邮箱 <strong style="color:var(--accent-dark)">${email}</strong> 还没有注册过掌上董事会账号。你可以立即注册，开始创建你的专属董事会。</p>
-      <div style="padding:12px 16px;background:rgba(184,147,90,.06);border-radius:var(--r-control);font-size:.82rem;color:var(--muted);line-height:1.6;margin:12px 0">
-        ✓ 注册即创建专属董事会<br>
-        ✓ 邀请朋友一起投票决策<br>
-        ✓ 6 级董事晋升体系
-      </div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal()">再想想</button>
         <button class="btn btn-gold" onclick="closeModal();go('register')">前往注册</button>
@@ -1317,45 +1297,8 @@ function verifyLoginEmail(){
     return;
   }
 
-  // 3. 已注册：发送验证邮件
-  state.pendingLoginEmail=email;
-  toast('正在发送验证邮件...','info');
-  setTimeout(()=>{
-    document.getElementById('verifyEmailDisplay').textContent=email;
-    go('verify-email');
-  },800);
-}
-
-// 第二步：验证邮件已发送 —— 重新发送
-function resendVerifyEmail(){
-  toast('验证邮件已重新发送','success');
-}
-
-// 第二步：验证邮件已发送 —— 完成验证
-function completeEmailVerify(){
-  if(!state.pendingLoginEmail){
-    toast('会话已过期，请重新输入邮箱','error');
-    go('login');
-    return;
-  }
-  document.getElementById('loginPwdSub').textContent='登录账号，继续召开董事会';
-  document.getElementById('loginPwd').value='';
-  go('login-pwd');
-}
-
-// 第三步：输入密码登录
-function doLogin(){
-  const email=state.pendingLoginEmail;
-  const pwd=document.getElementById('loginPwd').value;
-  if(!email){
-    toast('请先验证邮箱','info');
-    go('login');
-    return;
-  }
-  if(!pwd){toast('请输入密码','info');return;}
   state.currentUser.email=email;
   state.currentUser.password=pwd;
-  state.pendingLoginEmail=null;
   toast('登录成功，欢迎回来','success');
   setTimeout(()=>{
     if(state.boards.length===0){ go('onboarding'); }
@@ -1363,85 +1306,28 @@ function doLogin(){
   },600);
 }
 
-// ── 注册：发送邮箱验证码 ──
-function sendRegisterCode(){
+// 注册：昵称+邮箱+密码，仅验证邮箱格式
+function doRegister(){
+  const name=document.getElementById('regName').value.trim();
   const email=document.getElementById('regEmail').value.trim().toLowerCase();
+  const pwd=document.getElementById('regPwd').value;
   const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const btn=document.getElementById('sendCodeBtn');
-  const hint=document.getElementById('codeHint');
 
-  // 校验邮箱
-  if(!email){
-    toast('请先输入邮箱地址','info');
-    document.getElementById('regEmail').focus();
-    return;
-  }
-  if(!emailRegex.test(email)){
-    toast('邮箱格式不正确，请检查','error');
-    document.getElementById('regEmail').focus();
-    return;
-  }
+  if(!name){toast('请输入昵称','info');return;}
+  if(!email){toast('请输入邮箱地址','info');return;}
+  if(!emailRegex.test(email)){toast('邮箱格式不正确，请检查','error');return;}
+  if(!pwd||pwd.length<6){toast('密码至少 6 位','info');return;}
+
   // 检查是否已注册
   if(state.registeredEmails.includes(email)){
     showModal(`<h3>该邮箱已注册</h3><p class="modal-sub">邮箱 <strong style="color:var(--accent-dark)">${email}</strong> 已经注册过账号，可直接登录。</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">再想想</button><button class="btn btn-gold" onclick="closeModal();go('login')">去登录</button></div>`);
     return;
   }
 
-  // 生成6位随机验证码（前端演示用，真实环境由后端生成并发送邮件）
-  const code=String(Math.floor(100000+Math.random()*900000));
-  state.registerCode=code;
-
-  // 模拟发送邮件
-  btn.disabled=true;
-  btn.style.opacity='.6';
-  btn.textContent='发送中...';
-  toast('验证码发送中...','info');
-
-  setTimeout(()=>{
-    btn.textContent='重新发送(60s)';
-    hint.textContent=`验证码已发送至 ${email}，10 分钟内有效`;
-    hint.style.color='var(--success)';
-    toast('验证码已发送，请查收邮件','success');
-
-    // 倒计时60秒
-    let countdown=60;
-    state.registerCodeTimer=setInterval(()=>{
-      countdown--;
-      btn.textContent=`重新发送(${countdown}s)`;
-      if(countdown<=0){
-        clearInterval(state.registerCodeTimer);
-        btn.disabled=false;
-        btn.style.opacity='1';
-        btn.textContent='重新发送';
-        hint.textContent='验证码已过期，请重新获取';
-        hint.style.color='var(--muted)';
-      }
-    },1000);
-
-    // 开发环境提示：真实环境中验证码通过邮件发送
-    console.log('[开发提示] 本次注册验证码为:',code);
-  },800);
-}
-
-function doRegister(){
-  const name=document.getElementById('regName').value.trim();
-  const email=document.getElementById('regEmail').value.trim().toLowerCase();
-  const code=document.getElementById('regEmailCode').value.trim();
-  const pwd=document.getElementById('regPwd').value;
-
-  if(!name){toast('请输入昵称','info');return;}
-  if(!email||!email.includes('@')){toast('请输入有效邮箱','info');return;}
-  if(!code){toast('请输入邮箱验证码','info');return;}
-  if(!state.registerCode){toast('请先获取邮箱验证码','info');return;}
-  if(code!==state.registerCode){toast('验证码不正确，请重新输入','error');return;}
-  if(!pwd||pwd.length<6){toast('密码至少 6 位','info');return;}
-
   state.currentUser.name=name;
   state.currentUser.email=email;
   state.currentUser.password=pwd;
   state.registeredEmails.push(email);
-  state.registerCode=null;
-  clearInterval(state.registerCodeTimer);
 
   if(state.pendingInvite){
     toast('注册成功！正在加入受邀董事会...','success');
